@@ -4,7 +4,17 @@
       "Bash(vercel --version)",
       "Bash(git --version)",
       "Bash(npm --version)",
-      "Bash(gh --version)"
+      "Bash(gh --version)",
+      "Bash(git remote *)",
+      "Bash(git branch *)",
+      "Bash(git push *)",
+      "WebFetch(domain:developers.hyp.co.il)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(node -e \"require\\('./messages/he.json'\\); console.log\\('he.json OK'\\)\")",
+      "Bash(node -e \"require\\('./messages/en.json'\\); console.log\\('en.json OK'\\)\")",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)"
     ]
   }
 }

@@ -1,5 +1,6 @@
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
 import LayoutWrapper from "@/components/common/LayoutWrapper";
-
 import "../public/scss/main.scss";
 import "photoswipe/dist/photoswipe.css";
 import ScrollTop from "@/components/common/ScrollTop";
@@ -23,36 +24,46 @@ import ProductDes from "@/components/modals/ProductDes";
 import UnavailableModal from "@/components/modals/UnavailableModal";
 import OrderDetails from "@/components/modals/OrderDetails";
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+  const isRTL = locale === "he";
+
   return (
-    <html lang="en">
+    <html lang={locale} dir={isRTL ? "rtl" : "ltr"}>
+      <head>
+        <link
+          rel="stylesheet"
+          href={isRTL ? "/css/bootstrap.rtl.min.css" : "/css/bootstrap.min.css"}
+        />
+      </head>
       <body>
-        <LayoutWrapper>
-          <Context>
-            <div id="wrapper">{children}</div>
-            <Toolbar />
-
-            <ScrollTop />
-            <Compare />
-            <Login />
-            <MobileMenu />
-
-            <QuickAdd />
-            <QuickView />
-            <Register />
-            <ResetPass />
-            <Search />
-            <ShoppingCart />
-            <SizeGuide />
-            <AskQuestion />
-            <Delivery />
-            <Engrave />
-            <Pickup />
-            <ProductDes />
-            <UnavailableModal />
-            <OrderDetails />
-          </Context>
-        </LayoutWrapper>
+        <NextIntlClientProvider messages={messages}>
+          <LayoutWrapper>
+            <Context>
+              <div id="wrapper">{children}</div>
+              <Toolbar />
+              <ScrollTop />
+              <Compare />
+              <Login />
+              <MobileMenu />
+              <QuickAdd />
+              <QuickView />
+              <Register />
+              <ResetPass />
+              <Search />
+              <ShoppingCart />
+              <SizeGuide />
+              <AskQuestion />
+              <Delivery />
+              <Engrave />
+              <Pickup />
+              <ProductDes />
+              <UnavailableModal />
+              <OrderDetails />
+            </Context>
+          </LayoutWrapper>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

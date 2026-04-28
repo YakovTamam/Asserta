@@ -5,17 +5,10 @@ import Image from "next/image";
 import CurrencySelect from "../common/CurrencySelect";
 import LanguageSelect from "../common/LanguageSelect";
 import axios from "axios";
-const menuItems = [
-  "New Collection",
-  "All Jewelry",
-  "Charms",
-  "Bracelets",
-  "Rings",
-  "Earrings",
-  "Gifts",
-  "Collections",
-];
+import { useTranslations } from "next-intl";
 export default function Footer1() {
+  const t = useTranslations("footerMenu");
+  const menuItems = [t("newCollection"), t("allJewelry"), t("charms"), t("bracelets"), t("rings"), t("earrings"), t("gifts"), t("collections")];
   const [success, setSuccess] = useState(true);
   const [showMessage, setShowMessage] = useState(false);
   const handleShowMessage = () => {
@@ -106,30 +99,22 @@ export default function Footer1() {
             <div className="col-s1">
               <div className="footer-inner-wrap flex-lg-nowrap align-items-end">
                 <div className="box-title">
-                  <h6>
-                    JOIN THE <span className="text-primary">#VEMUS</span> TRIBE
-                  </h6>
+                  <h6>{t("joinTitle")}</h6>
                   <p className="notice font-2">
-                    <span className="fst-italic">Shiny Things</span> Await - 10%
-                    Off Inside!
+                    <span className="fst-italic">{t("joinSubtitle")}</span>
                   </p>
                 </div>
                 <div className="box-email">
-                  <p className="text-body text-main-3">
-                    Get early access to new products, exclusive deals &amp;
-                    more.
-                  </p>
+                  <p className="text-body text-main-3">{t("joinDesc")}</p>
                   <div
                     className={`tfSubscribeMsg  footer-sub-element ${
                       showMessage ? "active" : ""
                     }`}
                   >
                     {success ? (
-                      <p style={{ color: "rgb(52, 168, 83)" }}>
-                        You have successfully subscribed.
-                      </p>
+                      <p style={{ color: "rgb(52, 168, 83)" }}>{t("subscribeSuccess")}</p>
                     ) : (
-                      <p style={{ color: "red" }}>Something went wrong</p>
+                      <p style={{ color: "red" }}>{t("subscribeError")}</p>
                     )}
                   </div>
                   <form
@@ -160,15 +145,11 @@ export default function Footer1() {
             <div className="col-s2">
               <div className="footer-inner-wrap flex-sm-nowrap s2">
                 <div className="footer-col-block">
-                  <p className="footer-heading footer-heading-mobile font-2">
-                    find us
-                  </p>
+                  <p className="footer-heading footer-heading-mobile font-2">{t("findUs")}</p>
                   <div className="tf-collapse-content">
                     <ul className="footer-menu-list mb-24">
                       <li>
-                        <p className="text-main-4">
-                          Find a location nearest you.
-                        </p>
+                        <p className="text-main-4">{t("findLocation")}</p>
                       </li>
                       <li>
                         <a
@@ -176,7 +157,7 @@ export default function Footer1() {
                           target="_blank"
                           className="text-main-4 link text-decoration-underline"
                         >
-                          See Our Stores
+                          {t("seeStores")}
                         </a>
                       </li>
                       <li>
@@ -242,72 +223,45 @@ export default function Footer1() {
                   </div>
                 </div>
                 <div className="footer-col-block p-xl-0">
-                  <p className="footer-heading footer-heading-mobile font-2">
-                    HELP
-                  </p>
+                  <p className="footer-heading footer-heading-mobile font-2">{t("help")}</p>
                   <div className="tf-collapse-content">
                     <ul className="footer-menu-list">
                       <li>
-                        <Link href={`/shipping`} className="text-main-4 link">
-                          Shipping
-                        </Link>
+                        <Link href={`/shipping`} className="text-main-4 link">{t("shipping")}</Link>
                       </li>
                       <li>
-                        <Link href={`/return`} className="text-main-4 link">
-                          Returns
-                        </Link>
+                        <Link href={`/return`} className="text-main-4 link">{t("returns")}</Link>
                       </li>
                       <li>
-                        <Link href={`/privacy`} className="text-main-4 link">
-                          Privacy Policy
-                        </Link>
+                        <Link href={`/privacy`} className="text-main-4 link">{t("privacyPolicy")}</Link>
                       </li>
                       <li>
-                        <Link href={`/wishlist`} className="text-main-4 link">
-                          My Wishlist
-                        </Link>
+                        <Link href={`/wishlist`} className="text-main-4 link">{t("myWishlist")}</Link>
                       </li>
                       <li>
-                        <Link href={`/compare`} className="text-main-4 link">
-                          Compare
-                        </Link>
+                        <Link href={`/compare`} className="text-main-4 link">{t("compare")}</Link>
                       </li>
                       <li>
-                        <Link href={`/faq`} className="text-main-4 link">
-                          FAQ’s
-                        </Link>
+                        <Link href={`/faq`} className="text-main-4 link">{t("faq")}</Link>
                       </li>
                     </ul>
                   </div>
                 </div>
                 <div className="footer-col-block">
-                  <p className="footer-heading footer-heading-mobile font-2">
-                    ABOUT US
-                  </p>
+                  <p className="footer-heading footer-heading-mobile font-2">{t("aboutUs")}</p>
                   <div className="tf-collapse-content">
                     <ul className="footer-menu-list">
                       <li>
-                        <Link href={`/about-us`} className="text-main-4 link">
-                          Our Story
-                        </Link>
+                        <Link href={`/about-us`} className="text-main-4 link">{t("ourStory")}</Link>
                       </li>
                       <li>
-                        <Link href={`/our-store`} className="text-main-4 link">
-                          Visit Our Store
-                        </Link>
+                        <Link href={`/our-store`} className="text-main-4 link">{t("visitStore")}</Link>
                       </li>
                       <li>
-                        <Link href={`/contact-us`} className="text-main-4 link">
-                          Contact Us
-                        </Link>
+                        <Link href={`/contact-us`} className="text-main-4 link">{t("contactUs")}</Link>
                       </li>
                       <li>
-                        <Link
-                          href={`/account-page`}
-                          className="text-main-4 link"
-                        >
-                          Account
-                        </Link>
+                        <Link href={`/account-page`} className="text-main-4 link">{t("account")}</Link>
                       </li>
                     </ul>
                   </div>
@@ -328,7 +282,7 @@ export default function Footer1() {
                 <LanguageSelect />
               </div>
             </div>
-            <p className="text-nocopy">All Rights Reserved 2025 VEMUS.</p>
+            <p className="text-nocopy">{t("copyright")}</p>
             <ul className="paymend-method-list">
               <li>
                 <a href="#">

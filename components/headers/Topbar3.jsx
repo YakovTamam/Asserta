@@ -2,8 +2,10 @@
 import React from "react";
 import { Autoplay } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { useTranslations } from "next-intl";
 
 export default function Topbar3() {
+  const t = useTranslations("topbar");
   return (
     <div className="tf-topbar bg-dark-olive">
       <div className="container">
@@ -22,13 +24,13 @@ export default function Topbar3() {
           >
             <SwiperSlide className="swiper-slide">
               <p className="text-caption-3 fw-medium text-white text-line-clamp-1">
-                FREE STANDARD DELIVERY FOR ALL ORDERS OVER $200
+                {t("delivery")}
               </p>
             </SwiperSlide>
             {/* item 2 */}
             <SwiperSlide className="swiper-slide">
               <p className="text-caption-3 fw-medium text-white text-line-clamp-1">
-                FREE STANDARD DELIVERY FOR ALL ORDERS OVER $200
+                {t("delivery")}
               </p>
             </SwiperSlide>
           </Swiper>

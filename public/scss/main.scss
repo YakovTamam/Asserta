@@ -6,11 +6,27 @@
 @import "/icon/icomoon/style.css";
 
 /* Import core CSS files */
-@import "/css/bootstrap.min.css";
 @import "/css/swiper-bundle.min.css";
 @import "/css/animate.css";
 
 @include meta.load-css("app.scss");
+
+:root {
+  --bs-link-color: inherit;
+  --bs-link-color-rgb: inherit;
+  --bs-link-decoration: none;
+  --bs-link-hover-color: inherit;
+  --bs-link-hover-decoration: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  &:hover {
+    color: inherit;
+    text-decoration: none;
+  }
+}
 .infiniteSlider {
   align-items: center;
   animation: 50.7075s linear 0s infinite normal none running infiniteslide;

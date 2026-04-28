@@ -5,7 +5,10 @@ import Image from "next/image";
 import { useContextElement } from "@/context/Context";
 import ProgressBarComponent from "../common/Progressbar";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
+
 export default function ShoppingCart() {
+  const t = useTranslations("cart");
   const [openTool, setOpenTool] = useState(-1);
   const {
     cartProducts,
@@ -26,7 +29,7 @@ export default function ShoppingCart() {
     >
       <div className="canvas-wrapper">
         <div className="canvas-header">
-          <h3 className="title fw-normal text-uppercase">shopping cart</h3>
+          <h3 className="title fw-normal text-uppercase">{t("title")}</h3>
           <span
             className="icon-close link icon-close-popup"
             data-bs-dismiss="offcanvas"
@@ -46,14 +49,14 @@ export default function ShoppingCart() {
             <div className="tf-number-count">
               <p className="text-uppercase">
                 <span className="prd-count">{cartProducts.length}</span>{" "}
-                products
+                {t("products")}
               </p>
               <a
                 href="#"
                 onClick={() => setCartProducts([])}
                 className="tf-btn-line style-line-2 clear-file-delete"
               >
-                <span className="text-caption"> Empty cart </span>
+                <span className="text-caption">{t("emptyCart")}</span>
               </a>
             </div>
           </div>
@@ -63,12 +66,9 @@ export default function ShoppingCart() {
                 <ul className="tf-mini-cart-items">
                   {!cartProducts.length ? (
                     <>
-                      <div>Your Cart is Empty</div>
-                      <Link
-                        href={`/shop-default`}
-                        className="tf-btn w-100 style-2"
-                      >
-                        <span className="fw-medium"> Explore Products </span>
+                      <div>{t("empty")}</div>
+                      <Link href={`/shop-default`} className="tf-btn w-100 style-2">
+                        <span className="fw-medium">{t("exploreProducts")}</span>
                       </Link>
                     </>
                   ) : (
@@ -95,7 +95,7 @@ export default function ShoppingCart() {
                           Rose Gold / 50
                         </p>
                         <div className="prd-quantity">
-                          <p className="text-caption">Qty:</p>
+                          <p className="text-caption">{t("qty")}</p>
                           <div className="wg-quantity style-2">
                             <button
                               className="btn-quantity minus-quantity"
@@ -127,7 +127,7 @@ export default function ShoppingCart() {
                           className="tf-btn-line style-line-2 remove"
                           onClick={() => removeItem(product.id)}
                         >
-                          <span className="text-caption"> Remove </span>
+                          <span className="text-caption">{t("remove")}</span>
                         </a>
                       </div>
                       <p className="tf-mini-card-price h6 fw-normal">
@@ -145,41 +145,39 @@ export default function ShoppingCart() {
                   onClick={() => setOpenTool((pre) => (pre == 1 ? -1 : 1))}
                 >
                   <i className="icon icon-box" />
-                  <p className="text-caption">Add gift wrap</p>
+                  <p className="text-caption">{t("addGiftWrap")}</p>
                 </div>
                 <div
                   className="tf-mini-cart-tool-btn btn-add-note"
                   onClick={() => setOpenTool((pre) => (pre == 2 ? -1 : 2))}
                 >
                   <i className="icon icon-note" />
-                  <p className="text-caption">Order note</p>
+                  <p className="text-caption">{t("orderNote")}</p>
                 </div>
                 <div
                   className="tf-mini-cart-tool-btn btn-estimate-shipping"
                   onClick={() => setOpenTool((pre) => (pre == 3 ? -1 : 3))}
                 >
                   <i className="icon icon-delivery-3" />
-                  <p className="text-caption">Shipping</p>
+                  <p className="text-caption">{t("shipping")}</p>
                 </div>
               </div>
               <div className="tf-mini-cart-bottom-wrap">
                 <div className="tf-cart-totals-discounts">
-                  <h6 className="tf-cart-total-text fw-normal text-uppercase">
-                    total:
-                  </h6>
+                  <h6 className="tf-cart-total-text fw-normal text-uppercase">{t("total")}</h6>
                   <div className="tf-totals-total-value h6 fw-normal">
                     {totalPrice.toFixed(2)}
                   </div>
                 </div>
                 <div className="tf-mini-cart-view-checkout">
                   <Link href={`/shop-cart`} className="tf-btn w-100 style-2">
-                    <span className="fw-medium"> GO TO CART </span>
+                    <span className="fw-medium">{t("goToCart")}</span>
                   </Link>
                   <Link
                     href={`/checkout`}
                     className="tf-btn btn-fill animate-btn w-100"
                   >
-                    <span className="fw-medium"> CHECKOUT </span>
+                    <span className="fw-medium">{t("checkout")}</span>
                   </Link>
                 </div>
               </div>

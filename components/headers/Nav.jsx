@@ -12,9 +12,11 @@ import {
   shopPages,
 } from "@/data/menu";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 export default function Nav({ megaMarginRight = true }) {
   const pathname = usePathname();
+  const t = useTranslations("nav");
   const isMenuActive = (link) => {
     return link.href?.split("/")[1] == pathname.split("/")[1];
   };
@@ -30,7 +32,7 @@ export default function Nav({ megaMarginRight = true }) {
         className={`menu-item ${isMenuParentActive(demoPages) ? "active" : ""}`}
       >
         <a href="#" className="item-link">
-          Home
+          {t("home")}
           <i className="icon icon-arrow-angle-down" />
         </a>
         <div className="sub-menu mega-home start-0">
@@ -65,8 +67,7 @@ export default function Nav({ megaMarginRight = true }) {
             ))}
           </ul>
           <p className="font-2 text-coming">
-            MORE ARE
-            <span className="text-primary">COMING</span> SOON...
+            {t("moreComing")}
           </p>
         </div>
       </li>
@@ -76,7 +77,7 @@ export default function Nav({ megaMarginRight = true }) {
         }`}
       >
         <a href="#" className="item-link">
-          Shop
+          {t("shop")}
           <i className="icon icon-arrow-angle-down" />
         </a>
         <div
@@ -144,7 +145,7 @@ export default function Nav({ megaMarginRight = true }) {
         }`}
       >
         <a href="#" className="item-link">
-          Products
+          {t("products")}
           <i className="icon icon-arrow-angle-down" />
         </a>
         <div className="sub-menu mega-menu mega-menu-product">
@@ -245,7 +246,7 @@ export default function Nav({ megaMarginRight = true }) {
         } mega-menu-style-2`}
       >
         <a href="#" className="item-link">
-          Pages
+          {t("about")}
           <i className="icon icon-arrow-angle-down" />
         </a>
         <div className="sub-menu mega-menu mega-menu-page container-layout-right-3 mega-menu-style-2">
@@ -330,7 +331,7 @@ export default function Nav({ megaMarginRight = true }) {
         }`}
       >
         <a href="#" className="item-link">
-          Blogs
+          {t("blog")}
           <i className="icon icon-arrow-angle-down" />
         </a>
         <div className="sub-menu">

@@ -44,25 +44,25 @@ export const collections = [
 
 export const collections2 = [
   {
-    image: "/images/collections/cls-23.jpg",
-    title: "ANKLET",
+    image: "/images/collections/bracelets.jfif",
+    title: "BRACELETS",
     count: 23,
     delay: "",
   },
   {
-    image: "/images/collections/cls-24.jpg",
+    image: "/images/collections/earrings.jfif",
     title: "EARRINGS",
     count: 9,
     delay: "0.1s",
   },
   {
-    image: "/images/collections/cls-25.jpg",
+    image: "/images/collections/rings.jfif",
     title: "RINGS",
     count: 27,
     delay: "0.2s",
   },
   {
-    image: "/images/collections/cls-26.jpg",
+    image: "/images/collections/necklaces.jfif",
     title: "NECKLACES",
     count: 10,
     delay: "0.3s",

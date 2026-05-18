@@ -1,34 +1,47 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase-browser";
-import Image from "next/image";
 
 const emptyForm = {
   title_he: "", title_en: "", slug: "",
   description_he: "", description_en: "",
   price: "", old_price: "",
-  category_id: "", badge: "",
+  badge: "",
   in_stock: true, featured: false,
   images: [],
+  category_ids: [],
+};
+
+const s = {
+  pageTitle:  { fontSize: 20, fontWeight: 700, color: "#111", margin: "0 0 20px" },
+  card:       { background: "#fff", borderRadius: 14, padding: 20, boxShadow: "0 1px 4px rgba(0,0,0,0.07)", marginBottom: 12 },
+  label:      { fontSize: 12, color: "#888", display: "block", marginBottom: 5, fontWeight: 500 },
+  input:      { width: "100%", padding: "12px 14px", border: "1.5px solid #e8e8e8", borderRadius: 10, fontSize: 15, boxSizing: "border-box", outline: "none", background: "#fafafa" },
+  row:        { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 14 },
+  btnPrimary: { padding: "13px 24px", background: "#111", color: "#fff", border: "none", borderRadius: 10, fontSize: 15, fontWeight: 600, cursor: "pointer", flex: 1 },
+  btnGhost:   { padding: "13px 24px", background: "#f0f0f0", color: "#555", border: "none", borderRadius: 10, fontSize: 15, cursor: "pointer" },
+  btnDanger:  { padding: "7px 14px", background: "#fee2e2", color: "#e53e3e", border: "none", borderRadius: 8, fontSize: 13, cursor: "pointer" },
+  toggle:     { display: "flex", alignItems: "center", gap: 10, fontSize: 15, cursor: "pointer", userSelect: "none" },
 };
 
 export default function ProductsPage() {
-  const [products, setProducts] = useState([]);
+  const [products,   setProducts]   = useState([]);
   const [categories, setCategories] = useState([]);
-  const [form, setForm] = useState(emptyForm);
-  const [editId, setEditId] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [showForm, setShowForm] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const fileInputRef = useRef(null);
+  const [form,       setForm]       = useState(emptyForm);
+  const [editId,     setEditId]     = useState(null);
+  const [view,       setView]       = useState("list"); // "list" | "form"
+  const [saving,     setSaving]     = useState(false);
+  const [uploading,  setUploading]  = useState(false);
+  const [search,     setSearch]     = useState("");
+  const fileRef = useRef(null);
   const supabase = createClient();
 
   useEffect(() => { fetchAll(); }, []);
 
   async function fetchAll() {
     const [{ data: prods }, { data: cats }] = await Promise.all([
-      supabase.from("products").select("*, categories(name_he)").order("created_at", { ascending: false }),
-      supabase.from("categories").select("id, name_he"),
+      supabase.from("products").select("*").order("created_at", { ascending: false }),
+      supabase.from("categories").select("id, name_he, name_en, slug").order("name_he"),
     ]);
     setProducts(prods || []);
     setCategories(cats || []);
@@ -40,8 +53,17 @@ export default function ProductsPage() {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
       ...(name === "title_he" && !editId
-        ? { slug: value.trim().toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, "") }
+        ? { slug: value.trim().toLowerCase().replace(/[\s]+/g, "-").replace(/[^\w-]/g, "") }
         : {}),
+    }));
+  }
+
+  function toggleCategory(id) {
+    setForm((prev) => ({
+      ...prev,
+      category_ids: prev.category_ids.includes(id)
+        ? prev.category_ids.filter((c) => c !== id)
+        : [...prev.category_ids, id],
     }));
   }
 
@@ -53,51 +75,58 @@ export default function ProductsPage() {
     for (const file of files) {
       const fd = new FormData();
       fd.append("file", file);
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
+      const res  = await fetch("/api/upload", { method: "POST", body: fd });
       const data = await res.json();
       if (data.url) uploaded.push(data.url);
     }
     setForm((prev) => ({ ...prev, images: [...prev.images, ...uploaded] }));
     setUploading(false);
-    if (fileInputRef.current) fileInputRef.current.value = "";
+    if (fileRef.current) fileRef.current.value = "";
   }
 
-  function removeImage(index) {
-    setForm((prev) => ({ ...prev, images: prev.images.filter((_, i) => i !== index) }));
+  function removeImage(i) {
+    setForm((prev) => ({ ...prev, images: prev.images.filter((_, idx) => idx !== i) }));
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
-    setLoading(true);
+    setSaving(true);
     const payload = {
       ...form,
-      price: parseFloat(form.price),
+      price:     parseFloat(form.price),
       old_price: form.old_price ? parseFloat(form.old_price) : null,
-      category_id: form.category_id || null,
+      category_id:  form.category_ids[0] || null,
+      category_ids: form.category_ids,
     };
     if (editId) {
       await supabase.from("products").update(payload).eq("id", editId);
-      setEditId(null);
     } else {
       await supabase.from("products").insert(payload);
     }
     setForm(emptyForm);
-    setShowForm(false);
+    setEditId(null);
+    setView("list");
     await fetchAll();
-    setLoading(false);
+    setSaving(false);
   }
 
-  function handleEdit(p) {
+  function openEdit(p) {
     setEditId(p.id);
     setForm({
-      title_he: p.title_he, title_en: p.title_en, slug: p.slug,
-      description_he: p.description_he || "", description_en: p.description_en || "",
-      price: p.price, old_price: p.old_price || "",
-      category_id: p.category_id || "", badge: p.badge || "",
-      in_stock: p.in_stock, featured: p.featured,
-      images: p.images || [],
+      title_he:      p.title_he || "",
+      title_en:      p.title_en || "",
+      slug:          p.slug     || "",
+      description_he: p.description_he || "",
+      description_en: p.description_en || "",
+      price:         p.price    || "",
+      old_price:     p.old_price || "",
+      badge:         p.badge    || "",
+      in_stock:      p.in_stock ?? true,
+      featured:      p.featured  ?? false,
+      images:        p.images    || [],
+      category_ids:  p.category_ids || (p.category_id ? [p.category_id] : []),
     });
-    setShowForm(true);
+    setView("form");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -107,171 +136,246 @@ export default function ProductsPage() {
     fetchAll();
   }
 
-  const inputStyle = { width: "100%", padding: "9px 12px", border: "1px solid #ddd", borderRadius: 7, fontSize: 14, boxSizing: "border-box" };
-  const labelStyle = { fontSize: 12, color: "#777", display: "block", marginBottom: 4 };
+  const filtered = products.filter((p) =>
+    !search || (p.title_he + p.title_en).toLowerCase().includes(search.toLowerCase())
+  );
 
+  /* ── FORM VIEW ──────────────────────────────── */
+  if (view === "form") {
+    return (
+      <div>
+        {/* Header */}
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+          <button onClick={() => { setView("list"); setEditId(null); setForm(emptyForm); }}
+            style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "#555", padding: 0, lineHeight: 1 }}>
+            ←
+          </button>
+          <h2 style={{ ...s.pageTitle, margin: 0 }}>
+            {editId ? "עריכת מוצר" : "מוצר חדש"}
+          </h2>
+        </div>
+
+        <form onSubmit={handleSubmit}>
+
+          {/* Images */}
+          <div style={s.card}>
+            <label style={s.label}>תמונות המוצר</label>
+            <div
+              onClick={() => fileRef.current?.click()}
+              style={{
+                border: "2px dashed #ddd", borderRadius: 12, padding: "22px 16px",
+                textAlign: "center", cursor: "pointer", background: "#fafafa",
+                color: "#aaa", fontSize: 14, marginBottom: 14,
+              }}
+            >
+              {uploading ? "מעלה..." : "לחץ להוספת תמונות"}
+            </div>
+            <input ref={fileRef} type="file" accept="image/*" multiple
+              onChange={handleFileChange} style={{ display: "none" }} />
+
+            {form.images.length > 0 && (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+                {form.images.map((url, i) => (
+                  <div key={i} style={{ position: "relative" }}>
+                    <img src={url} alt="" style={{ width: 80, height: 80, objectFit: "cover", borderRadius: 10, border: "1px solid #eee" }} />
+                    {i === 0 && (
+                      <span style={{ position: "absolute", bottom: 4, right: 4, background: "#111", color: "#fff", fontSize: 9, padding: "2px 5px", borderRadius: 4 }}>ראשית</span>
+                    )}
+                    <button type="button" onClick={() => removeImage(i)}
+                      style={{ position: "absolute", top: -6, left: -6, background: "#e53e3e", color: "#fff", border: "none", borderRadius: "50%", width: 22, height: 22, cursor: "pointer", fontSize: 13, lineHeight: "22px", textAlign: "center", padding: 0, fontWeight: 700 }}>
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Names */}
+          <div style={s.card}>
+            <div style={{ marginBottom: 14 }}>
+              <label style={s.label}>שם המוצר (עברית) *</label>
+              <input name="title_he" value={form.title_he} onChange={handleChange} required
+                placeholder="לדוגמה: טבעת יהלום" style={s.input} />
+            </div>
+            <div style={{ marginBottom: 14 }}>
+              <label style={s.label}>שם המוצר (אנגלית)</label>
+              <input name="title_en" value={form.title_en} onChange={handleChange}
+                placeholder="e.g. Diamond Ring" style={s.input} />
+            </div>
+            <div>
+              <label style={s.label}>Slug (URL)</label>
+              <input name="slug" value={form.slug} onChange={handleChange} required style={s.input} />
+            </div>
+          </div>
+
+          {/* Prices */}
+          <div style={s.card}>
+            <div style={s.row}>
+              <div>
+                <label style={s.label}>מחיר (₪) *</label>
+                <input name="price" type="number" step="0.01" min="0" value={form.price}
+                  onChange={handleChange} required placeholder="0" style={s.input} />
+              </div>
+              <div>
+                <label style={s.label}>מחיר לפני הנחה (₪)</label>
+                <input name="old_price" type="number" step="0.01" min="0" value={form.old_price}
+                  onChange={handleChange} placeholder="0" style={s.input} />
+              </div>
+            </div>
+            <div>
+              <label style={s.label}>תג (Badge)</label>
+              <input name="badge" value={form.badge} onChange={handleChange}
+                placeholder="SALE, NEW, HOT..." style={s.input} />
+            </div>
+          </div>
+
+          {/* Categories */}
+          <div style={s.card}>
+            <label style={{ ...s.label, marginBottom: 12 }}>
+              קטגוריות
+              {form.category_ids.length > 0 && (
+                <span style={{ marginRight: 8, background: "#111", color: "#fff", borderRadius: 10, padding: "2px 8px", fontSize: 11 }}>
+                  {form.category_ids.length} נבחרו
+                </span>
+              )}
+            </label>
+            {categories.length === 0 ? (
+              <p style={{ color: "#aaa", fontSize: 13, margin: 0 }}>אין קטגוריות — צור קודם בעמוד קטגוריות</p>
+            ) : (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {categories.map((cat) => {
+                  const active = form.category_ids.includes(cat.id);
+                  return (
+                    <button key={cat.id} type="button" onClick={() => toggleCategory(cat.id)}
+                      style={{
+                        padding: "8px 16px", borderRadius: 20,
+                        border: `1.5px solid ${active ? "#111" : "#ddd"}`,
+                        background: active ? "#111" : "#fafafa",
+                        color:  active ? "#fff" : "#555",
+                        fontSize: 13, fontWeight: active ? 600 : 400,
+                        cursor: "pointer", transition: "all 0.15s",
+                      }}>
+                      {active && <span style={{ marginLeft: 4 }}>✓</span>}
+                      {cat.name_he}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Descriptions */}
+          <div style={s.card}>
+            <div style={{ marginBottom: 14 }}>
+              <label style={s.label}>תיאור (עברית)</label>
+              <textarea name="description_he" value={form.description_he} onChange={handleChange}
+                rows={3} placeholder="תאר את המוצר בעברית..."
+                style={{ ...s.input, resize: "vertical", lineHeight: 1.5 }} />
+            </div>
+            <div>
+              <label style={s.label}>תיאור (אנגלית)</label>
+              <textarea name="description_en" value={form.description_en} onChange={handleChange}
+                rows={3} placeholder="Describe the product in English..."
+                style={{ ...s.input, resize: "vertical", lineHeight: 1.5 }} />
+            </div>
+          </div>
+
+          {/* Toggles */}
+          <div style={{ ...s.card, display: "flex", gap: 32 }}>
+            <label style={s.toggle}>
+              <input type="checkbox" name="in_stock" checked={form.in_stock} onChange={handleChange}
+                style={{ width: 18, height: 18, cursor: "pointer" }} />
+              במלאי
+            </label>
+            <label style={s.toggle}>
+              <input type="checkbox" name="featured" checked={form.featured} onChange={handleChange}
+                style={{ width: 18, height: 18, cursor: "pointer" }} />
+              מוצר מומלץ
+            </label>
+          </div>
+
+          {/* Actions */}
+          <div style={{ display: "flex", gap: 10, position: "sticky", bottom: 16 }}>
+            <button type="submit" disabled={saving || uploading} style={{ ...s.btnPrimary, opacity: (saving || uploading) ? 0.6 : 1 }}>
+              {saving ? "שומר..." : editId ? "עדכן מוצר" : "הוסף מוצר"}
+            </button>
+            <button type="button" onClick={() => { setView("list"); setEditId(null); setForm(emptyForm); }} style={s.btnGhost}>
+              ביטול
+            </button>
+          </div>
+        </form>
+      </div>
+    );
+  }
+
+  /* ── LIST VIEW ──────────────────────────────── */
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-        <h2 style={{ fontSize: 22, fontWeight: 700, color: "#111", margin: 0 }}>מוצרים</h2>
-        <button
-          onClick={() => { setShowForm(!showForm); setEditId(null); setForm(emptyForm); }}
-          style={{ padding: "9px 20px", background: "#111", color: "#fff", border: "none", borderRadius: 7, fontSize: 14, cursor: "pointer" }}
-        >
-          {showForm ? "סגור" : "+ מוצר חדש"}
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+        <h2 style={s.pageTitle}>מוצרים ({products.length})</h2>
+        <button onClick={() => { setForm(emptyForm); setEditId(null); setView("form"); }} style={s.btnPrimary}>
+          + מוצר חדש
         </button>
       </div>
 
-      {showForm && (
-        <div style={{ background: "#fff", borderRadius: 12, padding: 24, marginBottom: 24, boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
-          <h3 style={{ fontSize: 15, fontWeight: 600, marginBottom: 16 }}>{editId ? "עריכת מוצר" : "מוצר חדש"}</h3>
-          <form onSubmit={handleSubmit}>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
-              <div><label style={labelStyle}>שם בעברית</label><input name="title_he" value={form.title_he} onChange={handleChange} required style={inputStyle} /></div>
-              <div><label style={labelStyle}>שם באנגלית</label><input name="title_en" value={form.title_en} onChange={handleChange} required style={inputStyle} /></div>
-              <div><label style={labelStyle}>Slug</label><input name="slug" value={form.slug} onChange={handleChange} required style={inputStyle} /></div>
-              <div>
-                <label style={labelStyle}>קטגוריה</label>
-                <select name="category_id" value={form.category_id} onChange={handleChange} style={inputStyle}>
-                  <option value="">ללא קטגוריה</option>
-                  {categories.map((c) => <option key={c.id} value={c.id}>{c.name_he}</option>)}
-                </select>
-              </div>
-              <div><label style={labelStyle}>מחיר (₪)</label><input name="price" type="number" step="0.01" value={form.price} onChange={handleChange} required style={inputStyle} /></div>
-              <div><label style={labelStyle}>מחיר לפני הנחה (₪)</label><input name="old_price" type="number" step="0.01" value={form.old_price} onChange={handleChange} style={inputStyle} /></div>
-              <div><label style={labelStyle}>תג (Badge)</label><input name="badge" value={form.badge} onChange={handleChange} placeholder="NEW, SALE..." style={inputStyle} /></div>
-            </div>
+      {/* Search */}
+      <input
+        value={search} onChange={(e) => setSearch(e.target.value)}
+        placeholder="חיפוש מוצר..."
+        style={{ ...s.input, marginBottom: 16 }}
+      />
 
-            <div style={{ marginBottom: 12 }}>
-              <label style={labelStyle}>תיאור בעברית</label>
-              <textarea name="description_he" value={form.description_he} onChange={handleChange} rows={3} style={{ ...inputStyle, resize: "vertical" }} />
-            </div>
-            <div style={{ marginBottom: 16 }}>
-              <label style={labelStyle}>תיאור באנגלית</label>
-              <textarea name="description_en" value={form.description_en} onChange={handleChange} rows={3} style={{ ...inputStyle, resize: "vertical" }} />
-            </div>
+      {/* Product cards */}
+      {filtered.length === 0 ? (
+        <div style={{ textAlign: "center", color: "#aaa", padding: "60px 0" }}>
+          {search ? "לא נמצאו תוצאות" : "אין מוצרים עדיין — לחץ + מוצר חדש"}
+        </div>
+      ) : (
+        <div style={{ display: "grid", gap: 10 }}>
+          {filtered.map((p) => {
+            const catNames = (p.category_ids || [])
+              .map((id) => categories.find((c) => c.id === id)?.name_he)
+              .filter(Boolean);
 
-            {/* Image Upload */}
-            <div style={{ marginBottom: 16 }}>
-              <label style={labelStyle}>תמונות מוצר</label>
-              <div
-                onClick={() => fileInputRef.current?.click()}
-                style={{
-                  border: "2px dashed #ddd", borderRadius: 10, padding: "20px",
-                  textAlign: "center", cursor: "pointer", background: "#fafafa",
-                  color: "#999", fontSize: 13, marginBottom: 12,
-                  transition: "border-color 0.2s",
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.borderColor = "#aaa"}
-                onMouseLeave={(e) => e.currentTarget.style.borderColor = "#ddd"}
-              >
-                {uploading ? "מעלה תמונות..." : "לחץ להעלאת תמונות (ניתן לבחור מספר)"}
-              </div>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleFileChange}
-                style={{ display: "none" }}
-              />
-
-              {form.images.length > 0 && (
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                  {form.images.map((url, i) => (
-                    <div key={i} style={{ position: "relative", width: 100, height: 100 }}>
-                      <img
-                        src={url}
-                        alt=""
-                        style={{ width: 100, height: 100, objectFit: "cover", borderRadius: 8, border: "1px solid #eee" }}
-                      />
-                      {i === 0 && (
-                        <span style={{
-                          position: "absolute", bottom: 4, left: 4,
-                          background: "#111", color: "#fff", fontSize: 9,
-                          padding: "2px 5px", borderRadius: 4,
-                        }}>ראשית</span>
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => removeImage(i)}
-                        style={{
-                          position: "absolute", top: 3, right: 3,
-                          background: "rgba(0,0,0,0.6)", color: "#fff",
-                          border: "none", borderRadius: "50%",
-                          width: 20, height: 20, cursor: "pointer",
-                          fontSize: 11, lineHeight: "20px", textAlign: "center", padding: 0,
-                        }}
-                      >×</button>
+            return (
+              <div key={p.id} style={{ ...s.card, display: "flex", gap: 14, alignItems: "center", cursor: "pointer", marginBottom: 0 }}
+                onClick={() => openEdit(p)}>
+                {p.images?.[0] ? (
+                  <img src={p.images[0]} alt="" style={{ width: 64, height: 64, objectFit: "cover", borderRadius: 10, flexShrink: 0 }} />
+                ) : (
+                  <div style={{ width: 64, height: 64, background: "#f0f0f0", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", color: "#ccc", fontSize: 22, flexShrink: 0 }}>◈</div>
+                )}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.title_he || p.title_en}</div>
+                  {catNames.length > 0 && (
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 4 }}>
+                      {catNames.map((n) => (
+                        <span key={n} style={{ fontSize: 10, background: "#f0f0f0", color: "#666", padding: "2px 7px", borderRadius: 8 }}>{n}</span>
+                      ))}
                     </div>
-                  ))}
+                  )}
+                  <div style={{ fontSize: 13, color: "#555" }}>
+                    ₪{p.price}
+                    {p.old_price && <span style={{ color: "#aaa", textDecoration: "line-through", marginRight: 6 }}>₪{p.old_price}</span>}
+                  </div>
                 </div>
-              )}
-            </div>
-
-            <div style={{ display: "flex", gap: 20, marginBottom: 16 }}>
-              <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 14, cursor: "pointer" }}>
-                <input type="checkbox" name="in_stock" checked={form.in_stock} onChange={handleChange} /> במלאי
-              </label>
-              <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 14, cursor: "pointer" }}>
-                <input type="checkbox" name="featured" checked={form.featured} onChange={handleChange} /> מוצר מומלץ
-              </label>
-            </div>
-
-            <div style={{ display: "flex", gap: 8 }}>
-              <button type="submit" disabled={loading || uploading}
-                style={{ padding: "9px 20px", background: "#111", color: "#fff", border: "none", borderRadius: 7, fontSize: 14, cursor: "pointer", opacity: (loading || uploading) ? 0.6 : 1 }}>
-                {loading ? "שומר..." : editId ? "עדכן" : "הוסף"}
-              </button>
-              <button type="button" onClick={() => { setShowForm(false); setEditId(null); setForm(emptyForm); }}
-                style={{ padding: "9px 20px", background: "#f0f0f0", color: "#555", border: "none", borderRadius: 7, fontSize: 14, cursor: "pointer" }}>
-                ביטול
-              </button>
-            </div>
-          </form>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6, flexShrink: 0 }}>
+                  <span style={{ fontSize: 11, padding: "3px 9px", borderRadius: 10, background: p.in_stock ? "#dcfce7" : "#fee2e2", color: p.in_stock ? "#16a34a" : "#dc2626" }}>
+                    {p.in_stock ? "במלאי" : "אזל"}
+                  </span>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleDelete(p.id); }}
+                    style={{ ...s.btnDanger, fontSize: 11, padding: "4px 10px" }}>
+                    מחק
+                  </button>
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
-
-      <div style={{ background: "#fff", borderRadius: 12, padding: 24, boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
-          <thead>
-            <tr style={{ borderBottom: "2px solid #f0f0f0" }}>
-              {["תמונה", "שם", "קטגוריה", "מחיר", "מלאי", "מומלץ", "פעולות"].map((h) => (
-                <th key={h} style={{ textAlign: "right", padding: "10px 0", color: "#888", fontWeight: 500 }}>{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {products.length === 0 && (
-              <tr><td colSpan={7} style={{ padding: "24px 0", color: "#aaa", textAlign: "center" }}>אין מוצרים עדיין</td></tr>
-            )}
-            {products.map((p) => (
-              <tr key={p.id} style={{ borderBottom: "1px solid #f5f5f5" }}>
-                <td style={{ padding: "10px 0" }}>
-                  {p.images?.[0] ? (
-                    <img src={p.images[0]} alt="" style={{ width: 48, height: 48, objectFit: "cover", borderRadius: 6 }} />
-                  ) : (
-                    <div style={{ width: 48, height: 48, background: "#f0f0f0", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", color: "#ccc", fontSize: 18 }}>+</div>
-                  )}
-                </td>
-                <td style={{ padding: "12px 0" }}>{p.title_he}</td>
-                <td style={{ padding: "12px 0", color: "#888" }}>{p.categories?.name_he || "—"}</td>
-                <td style={{ padding: "12px 0" }}>₪{p.price}</td>
-                <td style={{ padding: "12px 0" }}>
-                  <span style={{ background: p.in_stock ? "#dcfce7" : "#fee2e2", color: p.in_stock ? "#16a34a" : "#dc2626", padding: "2px 8px", borderRadius: 20, fontSize: 12 }}>
-                    {p.in_stock ? "כן" : "לא"}
-                  </span>
-                </td>
-                <td style={{ padding: "12px 0" }}>{p.featured ? "⭐" : "—"}</td>
-                <td style={{ padding: "12px 0" }}>
-                  <button onClick={() => handleEdit(p)} style={{ marginLeft: 8, padding: "4px 12px", background: "#f0f0f0", border: "none", borderRadius: 5, cursor: "pointer", fontSize: 13 }}>עריכה</button>
-                  <button onClick={() => handleDelete(p.id)} style={{ padding: "4px 12px", background: "#fee2e2", color: "#e53e3e", border: "none", borderRadius: 5, cursor: "pointer", fontSize: 13 }}>מחיקה</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
     </div>
   );
 }

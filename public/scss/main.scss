@@ -105,6 +105,20 @@ picture.jarallax-img img {
   cursor: pointer;
 }
 
+.logo-mobile {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .logo-desktop {
+    display: none;
+  }
+
+  .logo-mobile {
+    display: block;
+  }
+}
+
 /* ── Accessibility overrides ── */
 html.a11y-high-contrast {
   filter: contrast(160%);
@@ -133,7 +147,7 @@ html[dir="rtl"] {
   li,
   td,
   th {
-    font-family: "Frank Ruhl Libre", serif;
+    font-family: "Rubik", sans-serif;
     font-weight: 400;
     letter-spacing: 0;
   }
@@ -147,14 +161,14 @@ html[dir="rtl"] {
   .title,
   .name,
   .caption {
-    font-family: "Frank Ruhl Libre", serif;
+    font-family: "Rubik", sans-serif;
     font-weight: 500;
     letter-spacing: 0;
   }
 
   .text-hero-2,
   .text-main-9 {
-    font-family: "Frank Ruhl Libre", serif;
+    font-family: "Rubik", sans-serif;
     font-weight: 700;
   }
 }
@@ -165,7 +179,7 @@ html[dir="ltr"] {
   p,
   span,
   li {
-    font-family: "Cormorant Garamond", serif;
+    font-family: "Rubik", sans-serif;
     font-weight: 400;
     letter-spacing: 0.01em;
   }
@@ -175,7 +189,7 @@ html[dir="ltr"] {
   .heading,
   .font-2,
   .name-product {
-    font-family: "Cormorant Garamond", serif;
+    font-family: "Rubik", sans-serif;
     font-weight: 600;
     letter-spacing: 0.02em;
   }

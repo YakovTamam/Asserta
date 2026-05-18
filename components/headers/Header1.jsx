@@ -19,11 +19,22 @@ export default function Header1({ parentClass = "tf-header line-bt-2" }) {
           </div>
           <div className="col-xl-2 col-md-4 col-6">
             <Link href={`/`} className="logo-site">
+              {/* Desktop logo */}
               <Image
                 alt=""
                 width={122}
                 height={32}
                 src="/images/logo/logo.svg"
+                className="logo-desktop"
+              />
+
+              {/* Mobile logo */}
+              <Image
+                alt=""
+                width={100}
+                height={28}
+                src="/images/logo/logo-mobile.svg"
+                className="logo-mobile"
               />
             </Link>
           </div>

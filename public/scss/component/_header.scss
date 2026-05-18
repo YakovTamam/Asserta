@@ -133,6 +133,29 @@ header {
       border-color: var(--white) !important;
     }
   }
+
+  @include res(xl) {
+    background-color: black;
+
+    .nav-icon-item,
+    .nav-icon-item .icon,
+    .nav-icon-item i {
+      color: var(--white) !important;
+    }
+
+    .btn-mobile-menu {
+      span,
+      &::before,
+      &::after {
+        background-color: var(--white);
+      }
+    }
+
+    .lang-toggle-btn {
+      color: var(--white) !important;
+      border-color: var(--white) !important;
+    }
+  }
 }
 
 .tf-header {

@@ -243,6 +243,21 @@
     "recentPosts": "פוסטים אחרונים",
     "tags": "תגיות"
   },
+  "cookies": {
+    "message": "אנו משתמשים בעוגיות כדי לשפר את חווית הגלישה שלך ולנתח תנועה באתר.",
+    "accept": "אישור",
+    "decline": "דחייה",
+    "learnMore": "מדיניות פרטיות"
+  },
+  "accessibility": {
+    "title": "נגישות",
+    "fontSize": "גודל טקסט",
+    "highContrast": "ניגודיות גבוהה",
+    "grayscale": "גווני אפור",
+    "highlightLinks": "הדגש קישורים",
+    "reset": "איפוס הגדרות",
+    "button": "נגישות"
+  },
   "contact": {
     "title": "צור קשר",
     "name": "שם",

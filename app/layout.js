@@ -23,6 +23,8 @@ import Pickup from "@/components/modals/Pickup";
 import ProductDes from "@/components/modals/ProductDes";
 import UnavailableModal from "@/components/modals/UnavailableModal";
 import OrderDetails from "@/components/modals/OrderDetails";
+import AccessibilityWidget from "@/components/common/AccessibilityWidget";
+import CookieBanner from "@/components/common/CookieBanner";
 
 export default async function RootLayout({ children }) {
   const locale = await getLocale();
@@ -61,6 +63,8 @@ export default async function RootLayout({ children }) {
               <ProductDes />
               <UnavailableModal />
               <OrderDetails />
+              <AccessibilityWidget />
+              <CookieBanner />
             </Context>
           </LayoutWrapper>
         </NextIntlClientProvider>

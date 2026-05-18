@@ -105,6 +105,22 @@ picture.jarallax-img img {
   cursor: pointer;
 }
 
+/* ── Accessibility overrides ── */
+html.a11y-high-contrast {
+  filter: contrast(160%);
+}
+html.a11y-grayscale {
+  filter: grayscale(100%);
+}
+html.a11y-high-contrast.a11y-grayscale {
+  filter: contrast(160%) grayscale(100%);
+}
+html.a11y-highlight-links a {
+  text-decoration: underline !important;
+  outline: 2px solid #f5a623;
+  outline-offset: 1px;
+}
+
 /* ── Hebrew (RTL) typography ── */
 html[dir="rtl"] {
   body,

@@ -243,6 +243,21 @@
     "recentPosts": "Recent Posts",
     "tags": "Tags"
   },
+  "cookies": {
+    "message": "We use cookies to enhance your browsing experience and analyze site traffic.",
+    "accept": "Accept",
+    "decline": "Decline",
+    "learnMore": "Privacy Policy"
+  },
+  "accessibility": {
+    "title": "Accessibility",
+    "fontSize": "Text Size",
+    "highContrast": "High Contrast",
+    "grayscale": "Grayscale",
+    "highlightLinks": "Highlight Links",
+    "reset": "Reset Settings",
+    "button": "Accessibility"
+  },
   "contact": {
     "title": "Contact Us",
     "name": "Name",

@@ -21,6 +21,7 @@ export default function LangToggle() {
   return (
     <button
       onClick={toggle}
+      className="lang-toggle-btn"
       style={{
         background: "none",
         border: "1px solid #111",

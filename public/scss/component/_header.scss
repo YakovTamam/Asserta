@@ -105,8 +105,33 @@ header {
   transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 
   &.header-sticky {
-    background-color: var(--white);
+    background-color: black;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+    .nav-icon-item,
+    .nav-icon-item .icon,
+    .nav-icon-item i {
+      color: var(--white) !important;
+    }
+
+    .btn-mobile-menu {
+      span,
+      &::before,
+      &::after {
+        background-color: var(--white);
+      }
+    }
+
+    .item-link,
+    .menu-item,
+    .menu-item .item-link {
+      color: var(--white);
+    }
+
+    .lang-toggle-btn {
+      color: var(--white) !important;
+      border-color: var(--white) !important;
+    }
   }
 }
 

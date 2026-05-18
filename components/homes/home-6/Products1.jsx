@@ -31,7 +31,7 @@ export default function Products1() {
           </div>
         </div>
         <Swiper
-          dir="ltr"
+          loop={true}
           className="swiper tf-swiper wow fadeInUp"
           breakpoints={{
             0: { slidesPerView: 2 },

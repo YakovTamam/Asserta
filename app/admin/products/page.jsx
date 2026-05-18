@@ -10,6 +10,7 @@ const emptyForm = {
   in_stock: true, featured: false,
   images: [],
   category_ids: [],
+  specs: [],
 };
 
 const s = {
@@ -65,6 +66,32 @@ export default function ProductsPage() {
         ? prev.category_ids.filter((c) => c !== id)
         : [...prev.category_ids, id],
     }));
+  }
+
+  function addSpec() {
+    setForm((prev) => ({ ...prev, specs: [...prev.specs, { icon_url: "", value: "", label: "" }] }));
+  }
+
+  function removeSpec(i) {
+    setForm((prev) => ({ ...prev, specs: prev.specs.filter((_, idx) => idx !== i) }));
+  }
+
+  function updateSpec(i, field, val) {
+    setForm((prev) => ({
+      ...prev,
+      specs: prev.specs.map((sp, idx) => idx === i ? { ...sp, [field]: val } : sp),
+    }));
+  }
+
+  async function handleSpecIcon(e, i) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const fd = new FormData();
+    fd.append("file", file);
+    const res  = await fetch("/api/upload", { method: "POST", body: fd });
+    const data = await res.json();
+    if (data.url) updateSpec(i, "icon_url", data.url);
+    e.target.value = "";
   }
 
   async function handleFileChange(e) {
@@ -125,6 +152,7 @@ export default function ProductsPage() {
       featured:      p.featured  ?? false,
       images:        p.images    || [],
       category_ids:  p.category_ids || (p.category_id ? [p.category_id] : []),
+      specs:         p.specs || [],
     });
     setView("form");
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -263,6 +291,58 @@ export default function ProductsPage() {
                 })}
               </div>
             )}
+          </div>
+
+          {/* Specs */}
+          <div style={s.card}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+              <label style={{ ...s.label, margin: 0 }}>מפרטים טכניים</label>
+              <button type="button" onClick={addSpec}
+                style={{ padding: "6px 14px", background: "#111", color: "#fff", border: "none", borderRadius: 8, fontSize: 13, cursor: "pointer" }}>
+                + הוסף מפרט
+              </button>
+            </div>
+
+            {form.specs.length === 0 && (
+              <p style={{ color: "#bbb", fontSize: 13, margin: 0 }}>לחץ "הוסף מפרט" להוספת נתונים טכניים כמו קראט, סוג אבן וכו'</p>
+            )}
+
+            {form.specs.map((spec, i) => (
+              <div key={i} style={{ display: "grid", gridTemplateColumns: "52px 1fr 1fr 32px", gap: 8, alignItems: "center", marginBottom: 10, padding: "10px", background: "#fafafa", borderRadius: 10, border: "1px solid #f0f0f0" }}>
+                {/* Icon upload */}
+                <div>
+                  <input
+                    type="file" accept="image/*"
+                    id={`spec-icon-${i}`}
+                    style={{ display: "none" }}
+                    onChange={(e) => handleSpecIcon(e, i)}
+                  />
+                  <label htmlFor={`spec-icon-${i}`} style={{ cursor: "pointer", display: "block" }}>
+                    {spec.icon_url ? (
+                      <img src={spec.icon_url} alt="" style={{ width: 44, height: 44, objectFit: "contain", borderRadius: 8, border: "1px solid #eee", background: "#fff" }} />
+                    ) : (
+                      <div style={{ width: 44, height: 44, border: "1.5px dashed #ddd", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", color: "#bbb", fontSize: 20, background: "#fff" }}>+</div>
+                    )}
+                  </label>
+                </div>
+                <input
+                  placeholder="ערך (11.7ct)"
+                  value={spec.value}
+                  onChange={(e) => updateSpec(i, "value", e.target.value)}
+                  style={{ ...s.input, fontSize: 13, padding: "9px 10px" }}
+                />
+                <input
+                  placeholder="תווית (קראט)"
+                  value={spec.label}
+                  onChange={(e) => updateSpec(i, "label", e.target.value)}
+                  style={{ ...s.input, fontSize: 13, padding: "9px 10px" }}
+                />
+                <button type="button" onClick={() => removeSpec(i)}
+                  style={{ background: "none", border: "none", color: "#e53e3e", fontSize: 20, cursor: "pointer", padding: 0, lineHeight: 1 }}>
+                  ×
+                </button>
+              </div>
+            ))}
           </div>
 
           {/* Descriptions */}

@@ -48,6 +48,7 @@ export async function GET(request) {
       category:     cats[0]?.slug || "",
       categoryName: cats[0]?.name_he || "",
       description:  p.description_he || p.description_en || "",
+      specs:        Array.isArray(p.specs) ? p.specs : [],
     };
   });
 

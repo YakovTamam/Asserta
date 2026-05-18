@@ -4,16 +4,49 @@ import Topbar3 from "@/components/headers/Topbar3";
 import Details1 from "@/components/product-details/Details1";
 import RelatedProducts from "@/components/product-details/RelatedProducts";
 import Link from "next/link";
-import { allProducts } from "@/data/products";
+import { supabaseAdmin } from "@/lib/supabase-server";
+import { notFound } from "next/navigation";
 
-export const metadata = {
-  title: "מוצר | Asserta",
-  description: "Asserta - תכשיטים מעוצבים",
-};
+export const dynamic = "force-dynamic";
+
+export async function generateMetadata({ params }) {
+  const { id } = await params;
+  const { data } = await supabaseAdmin
+    .from("products")
+    .select("title_he, title_en")
+    .eq("id", id)
+    .single();
+  return {
+    title: data ? `${data.title_he || data.title_en} | Asserta` : "מוצר | Asserta",
+  };
+}
 
 export default async function ProductDetailPage({ params }) {
   const { id } = await params;
-  const product = allProducts.find((p) => p.id == id) || allProducts[0];
+
+  const { data } = await supabaseAdmin
+    .from("products")
+    .select("*, categories(name_he, slug)")
+    .eq("id", id)
+    .single();
+
+  if (!data) notFound();
+
+  const product = {
+    id: data.id,
+    title: data.title_he || data.title_en || "",
+    slug: data.slug,
+    imgSrc: data.images?.[0] || "/images/products/product-1.jpg",
+    hoverImgSrc: data.images?.[1] || data.images?.[0] || "/images/products/product-1.jpg",
+    images: data.images || [],
+    price: Number(data.price),
+    oldPrice: data.old_price ? Number(data.old_price) : null,
+    badge: data.badge || null,
+    outOfStock: !data.in_stock,
+    featured: data.featured,
+    category: data.categories?.slug || "",
+    description: data.description_he || data.description_en || "",
+  };
 
   return (
     <div className="bg-surface">

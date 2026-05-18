@@ -1,19 +1,37 @@
 "use client";
-import { products11 } from "@/data/products";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import Image from "next/image";
 import AddtoWishlist from "@/components/common/AddtoWishlist";
 import AddtoCart from "@/components/common/AddtoCart";
 import QuickView from "@/components/common/QuickView";
 import AddtoCompare from "@/components/common/AddtoCompare";
-import DiscountMarquee from "@/components/common/DiscountMarquee";
 import { Navigation, Pagination } from "swiper/modules";
-import CountdownTimer from "@/components/common/Countdown";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+
 export default function Products1() {
   const t = useTranslations();
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    fetch("/api/products?featured=true")
+      .then((r) => r.json())
+      .then((data) => {
+        const items = Array.isArray(data) ? data : [];
+        // fallback: if no featured products, show all
+        if (items.length === 0) {
+          return fetch("/api/products")
+            .then((r) => r.json())
+            .then((all) => setProducts(Array.isArray(all) ? all : []));
+        }
+        setProducts(items);
+      })
+      .catch(() => {});
+  }, []);
+
+  if (products.length === 0) return null;
+
   return (
     <section className="flat-spacing-9 px-xxl_15 pb-0">
       <div className="container">
@@ -21,7 +39,7 @@ export default function Products1() {
           <h2 className="s-title font-2 text-capitalize">
             {t("home.bestSellers")}
           </h2>
-          <div className="group-btn-slider type-2 ">
+          <div className="group-btn-slider type-2">
             <div className="nav-next-swiper tf-sw-nav snbn35">
               <i className="icon-arrow-right" />
             </div>
@@ -31,63 +49,45 @@ export default function Products1() {
           </div>
         </div>
         <Swiper
-          loop={true}
+          loop={products.length > 4}
           className="swiper tf-swiper wow fadeInUp"
           breakpoints={{
             0: { slidesPerView: 2 },
-            575: {
-              slidesPerView: 2,
-            },
-            768: {
-              slidesPerView: 3,
-              spaceBetween: 20,
-            },
-            1200: {
-              slidesPerView: 4,
-              spaceBetween: 30,
-            },
+            575: { slidesPerView: 2 },
+            768: { slidesPerView: 3, spaceBetween: 20 },
+            1200: { slidesPerView: 4, spaceBetween: 30 },
           }}
           spaceBetween={15}
           modules={[Navigation, Pagination]}
-          pagination={{
-            clickable: true,
-            el: ".spd35",
-          }}
-          navigation={{
-            nextEl: ".snbn35",
-            prevEl: ".snbp35",
-          }}
+          pagination={{ clickable: true, el: ".spd35" }}
+          navigation={{ nextEl: ".snbn35", prevEl: ".snbp35" }}
         >
-          {products11.map((item) => (
+          {products.map((item) => (
             <SwiperSlide className="swiper-slide" key={item.id}>
-              <div
-                className={`card_product--V01 type-space-35 ${
-                  item.outOfStock ? "out-of-stock" : ""
-                }`}
-              >
+              <div className={`card_product--V01 type-space-35 ${item.outOfStock ? "out-of-stock" : ""}`}>
                 <div className="card_product-wrapper">
                   <Link
-                    href={`/${
-                      item.outOfStock
-                        ? "product-notify-avaiable"
-                        : "product-default"
-                    }/${item.id}`}
+                    href={`/product-default/${item.id}`}
                     className="product-img"
                   >
                     <Image
                       src={item.imgSrc}
-                      alt="Image Product"
+                      alt={item.title}
                       className="lazyload img-product"
                       width={714}
                       height={900}
+                      unoptimized
                     />
-                    <Image
-                      src={item.hoverImgSrc}
-                      alt="Image Product"
-                      className="lazyload img-hover"
-                      width={714}
-                      height={900}
-                    />
+                    {item.hoverImgSrc && item.hoverImgSrc !== item.imgSrc && (
+                      <Image
+                        src={item.hoverImgSrc}
+                        alt={item.title}
+                        className="lazyload img-hover"
+                        width={714}
+                        height={900}
+                        unoptimized
+                      />
+                    )}
                   </Link>
 
                   {!item.outOfStock && (
@@ -109,60 +109,14 @@ export default function Products1() {
 
                   {item.badge && (
                     <div className="badge-box">
-                      <span className={`badge-item ${item.badgeType}`}>
-                        {item.badge}
-                      </span>
+                      <span className="badge-item">{item.badge}</span>
                     </div>
-                  )}
-
-                  {item.variantType === "text" && (
-                    <div className="variant-box">
-                      <p className="size-box text-center text-caption">
-                        {item.variantText}
-                      </p>
-                    </div>
-                  )}
-
-                  {item.variantType === "countdown" && (
-                    <div className="variant-box count-down">
-                      <div className="countdown-V02">
-                        <div className="js-countdown">
-                          <CountdownTimer
-                            style={5}
-                            targetDate={item.targetDate}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {item.variantType === "marquee" && (
-                    <div className="variant-box bg-primary-2">
-                      <DiscountMarquee parentClass="marquee-sale infiniteSlide infiniteSlider" />
-                    </div>
-                  )}
-
-                  {item.variantType === "notify" && (
-                    <a
-                      href="#unavailable"
-                      data-bs-toggle="modal"
-                      className="variant-box stock bg-main link text-white"
-                    >
-                      <p className="text-center d-none d-md-block">
-                        {item.variantText}
-                      </p>
-                      <p className="text-center d-md-none">Notify Me</p>
-                    </a>
                   )}
                 </div>
 
                 <div className="card_product-info">
                   <Link
-                    href={`/${
-                      item.outOfStock
-                        ? "product-notify-avaiable"
-                        : "product-default"
-                    }/${item.id}`}
+                    href={`/product-default/${item.id}`}
                     className="name-product h5 fw-normal link text-line-clamp-2"
                     style={{ textAlign: "right" }}
                   >
@@ -174,7 +128,7 @@ export default function Products1() {
                         ₪{item.oldPrice.toFixed(2)}
                       </span>
                     )}
-                    <span className={`price-new h5 ${item.textColor || ""}`}>
+                    <span className="price-new h5">
                       ₪{item.price.toFixed(2)}
                     </span>
                   </div>
@@ -182,7 +136,6 @@ export default function Products1() {
               </div>
             </SwiperSlide>
           ))}
-
           <div className="sw-dot-default tf-sw-pagination type-space-2 spd35" />
         </Swiper>
       </div>

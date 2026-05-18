@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { collections2 } from "@/data/collections";
 import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -13,7 +13,6 @@ export default function Collections() {
     <div className="flat-spacing-12 pb-0">
       <div className="container-full-2">
         <Swiper
-          dir="ltr"
           loop={true}
           className="swiper tf-swiper"
           breakpoints={{

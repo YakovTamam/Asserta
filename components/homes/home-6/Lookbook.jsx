@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { products13 } from "@/data/products";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -103,7 +103,6 @@ export default function Lookbook() {
               {t("home.shopTheLook")} <span className="fst-italic">{t("home.shopTheLook2")}</span>
             </h2>
             <Swiper
-              dir="ltr"
               className="swiper tf-swiper sw-look"
               spaceBetween={10}
               breakpoints={{
@@ -175,13 +174,13 @@ export default function Lookbook() {
                       </Link>
                       <div className="price-wrap">
                         <span className="price-new h5 text-secondary">
-                          ₪{product.price.toLocaleString(undefined, {
+                          ג‚×{product.price.toLocaleString(undefined, {
                             minimumFractionDigits: 2,
                           })}
                         </span>
                         {product.oldPrice && (
                           <span className="price-old fw-normal">
-                            ₪{product.oldPrice.toLocaleString(undefined, {
+                            ג‚×{product.oldPrice.toLocaleString(undefined, {
                               minimumFractionDigits: 2,
                             })}
                           </span>

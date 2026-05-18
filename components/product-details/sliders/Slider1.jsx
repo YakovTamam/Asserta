@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
 import { Navigation, Thumbs } from "swiper/modules";
@@ -171,7 +171,6 @@ export default function Slider1({
       {" "}
       <div className="flat-wrap-media-product">
         <Swiper
-          dir="ltr"
           className="swiper tf-product-media-main"
           id="gallery-swiper-started"
           thumbs={{ swiper: thumbSwiper }}
@@ -214,7 +213,6 @@ export default function Slider1({
         </Swiper>
       </div>
       <Swiper
-        dir="ltr"
         className="swiper tf-product-media-thumbs"
         onSwiper={setThumbSwiper}
         modules={[Thumbs]}

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { products11 } from "@/data/products";
 import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -31,7 +31,6 @@ export default function Products1() {
           </div>
         </div>
         <Swiper
-          dir="ltr"
           className="swiper tf-swiper wow fadeInUp"
           breakpoints={{
             0: { slidesPerView: 2 },
@@ -171,11 +170,11 @@ export default function Products1() {
                   <div className="price-wrap">
                     {item.oldPrice && (
                       <span className="price-old fw-normal">
-                        ₪{item.oldPrice.toFixed(2)}
+                        ג‚×{item.oldPrice.toFixed(2)}
                       </span>
                     )}
                     <span className={`price-new h5 ${item.textColor || ""}`}>
-                      ₪{item.price.toFixed(2)}
+                      ג‚×{item.price.toFixed(2)}
                     </span>
                   </div>
                 </div>

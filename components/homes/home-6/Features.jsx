@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { boxFeatures } from "@/data/features";
 import React from "react";
 import { Pagination } from "swiper/modules";
@@ -19,7 +19,6 @@ export default function Features() {
       <div className="container">
         <div className="line-bt py-20">
           <Swiper
-            dir="ltr"
             className="swiper tf-swiper"
             breakpoints={{
               0: { slidesPerView: 1 },

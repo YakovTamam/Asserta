@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React from "react";
 import { Autoplay, EffectFade, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -8,9 +8,9 @@ import { useTranslations } from "next-intl";
 const heroSlider = [
   {
     image: "/images/hero1.png",
-    cta: "לגילוי הקולקציה",
-    title: "המתנה המושלמת",
-    subtitle: "משלוח מהיר עד הבית",
+    cta: "׳׳’׳™׳׳•׳™ ׳”׳§׳•׳׳§׳¦׳™׳”",
+    title: "׳”׳׳×׳ ׳” ׳”׳׳•׳©׳׳׳×",
+    subtitle: "׳׳©׳׳•׳— ׳׳”׳™׳¨ ׳¢׳“ ׳”׳‘׳™׳×",
     imageWidth: 2790,
     imageHeight: 1226,
     buttonClass: "tf-btn type-large style-white-2",
@@ -19,9 +19,9 @@ const heroSlider = [
     image: "/images/hero2.png",
     imageWidth: 2790,
     imageHeight: 1226,
-    title: "הרגעים שלכם",
-    subtitle: "הניצוץ שלנו",
-    cta: "להצצה בעיצובים",
+    title: "׳”׳¨׳’׳¢׳™׳ ׳©׳׳›׳",
+    subtitle: "׳”׳ ׳™׳¦׳•׳¥ ׳©׳׳ ׳•",
+    cta: "׳׳”׳¦׳¦׳” ׳‘׳¢׳™׳¦׳•׳‘׳™׳",
     buttonClass: "tf-btn type-large style-white-3",
     titleClass: "text-main",
   },
@@ -29,9 +29,9 @@ const heroSlider = [
     image: "/images/hero3.png",
     imageWidth: 2790,
     imageHeight: 1226,
-    title: "המתנה המושלמת",
-    subtitle: "משלוח מהיר עד הבית",
-    cta: "לבחירת מתנה",
+    title: "׳”׳׳×׳ ׳” ׳”׳׳•׳©׳׳׳×",
+    subtitle: "׳׳©׳׳•׳— ׳׳”׳™׳¨ ׳¢׳“ ׳”׳‘׳™׳×",
+    cta: "׳׳‘׳—׳™׳¨׳× ׳׳×׳ ׳”",
     buttonClass: "tf-btn type-large style-white-2",
   },
 ];
@@ -45,7 +45,6 @@ export default function Hero() {
     <div className="tf-slideshow">
       <div className="container-full-2">
         <Swiper
-          dir="ltr"
           className="swiper tf-swiper sw-slide-show slider_effect_fade"
           loop
           autoplay={{ delay: 13000 }}

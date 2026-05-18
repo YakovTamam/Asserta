@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
 import { Navigation, Pagination, Thumbs } from "swiper/modules";
@@ -168,7 +168,6 @@ export default function Slider3({
 
   return (
     <Swiper
-      dir="ltr"
       className="swiper tf-product-media-main"
       id="gallery-swiper-started"
       modules={[Navigation, Pagination]}

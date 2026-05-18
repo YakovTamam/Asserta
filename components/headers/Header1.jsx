@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Nav from "./Nav";
-import LangToggle from "@/components/common/LangToggle";
+
 export default function Header1({ parentClass = "tf-header line-bt-2" }) {
   return (
     <header className={parentClass}>
@@ -19,7 +19,6 @@ export default function Header1({ parentClass = "tf-header line-bt-2" }) {
           </div>
           <div className="col-xl-2 col-md-4 col-6">
             <Link href={`/`} className="logo-site">
-              {/* Desktop logo */}
               <Image
                 alt=""
                 width={122}
@@ -27,8 +26,6 @@ export default function Header1({ parentClass = "tf-header line-bt-2" }) {
                 src="/images/logo/logo.svg"
                 className="logo-desktop"
               />
-
-              {/* Mobile logo */}
               <Image
                 alt=""
                 width={100}
@@ -47,16 +44,7 @@ export default function Header1({ parentClass = "tf-header line-bt-2" }) {
           </div>
           <div className="col-xl-2 col-md-4 col-3">
             <ul className="nav-icon">
-              <li className="d-inline-flex">
-                <a
-                  href="#search"
-                  data-bs-toggle="offcanvas"
-                  className="nav-icon-item text-black link"
-                >
-                  <i className="icon icon-search" />
-                </a>
-              </li>
-              <li className="br-line d-none d-xl-flex" />
+              {/* Account */}
               <li className="d-none d-md-inline-flex">
                 <a
                   href="#log"
@@ -66,14 +54,33 @@ export default function Header1({ parentClass = "tf-header line-bt-2" }) {
                   <i className="icon icon-user" />
                 </a>
               </li>
+              {/* Shop */}
               <li className="d-none d-md-inline-flex">
+                <Link
+                  href={`/shop-collection-list`}
+                  className="nav-icon-item text-black link"
+                >
+                  <i className="icon icon-dou-bag" />
+                </Link>
+              </li>
+              {/* Wishlist — filled heart */}
+              <li className="d-inline-flex">
                 <Link
                   href={`/wishlist`}
                   className="nav-icon-item text-black link"
                 >
-                  <i className="icon icon-hearth" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                  </svg>
                 </Link>
               </li>
+              {/* Cart — rightmost */}
               <li className="d-inline-flex">
                 <a
                   href="#shoppingCart"
@@ -83,9 +90,6 @@ export default function Header1({ parentClass = "tf-header line-bt-2" }) {
                   <i className="icon icon-cart" />
                   <span className="count-notice" />
                 </a>
-              </li>
-              <li className="d-inline-flex align-items-center">
-                <LangToggle />
               </li>
             </ul>
           </div>

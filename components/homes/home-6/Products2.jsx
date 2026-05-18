@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import { products12 } from "@/data/products";
 import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -21,6 +21,7 @@ export default function Products2() {
           </h2>
         </div>
         <Swiper
+          dir="ltr"
           className="swiper tf-swiper wow fadeInUp"
           spaceBetween={10}
           breakpoints={{
@@ -92,13 +93,13 @@ export default function Products2() {
                         product.oldPrice ? "text-secondary" : ""
                       } h5`}
                     >
-                      ג‚×{product.price.toLocaleString(undefined, {
+                      ₪{product.price.toLocaleString(undefined, {
                         minimumFractionDigits: 2,
                       })}
                     </span>
                     {product.oldPrice && (
                       <span className="price-old fw-normal">
-                        ג‚×{product.oldPrice.toLocaleString(undefined, {
+                        ₪{product.oldPrice.toLocaleString(undefined, {
                           minimumFractionDigits: 2,
                         })}
                       </span>

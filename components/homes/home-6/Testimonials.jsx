@@ -5,7 +5,9 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import Link from "next/link";
 import Image from "next/image";
 import { Navigation, Pagination } from "swiper/modules";
+import { useTranslations } from "next-intl";
 export default function Testimonials() {
+  const t = useTranslations();
   return (
     <section className="themesFlat">
       <div
@@ -15,7 +17,7 @@ export default function Testimonials() {
         <div className="container">
           <div className="sect-top align-items-end wow fadeInUp">
             <h2 className="s-title font-2 text-white text-capitalize">
-              Customer <span className="fst-italic">Reviews</span>
+              {t("home.testimonials")}
             </h2>
             <div className="group-btn-slider style-white">
               <div className="nav-prev-swiper tf-sw-nav snbp38">
@@ -97,7 +99,7 @@ export default function Testimonials() {
                               />
                             </g>
                           </svg>
-                          Verified
+                          {t("common.verified")}
                         </p>
                       </div>
                     </div>

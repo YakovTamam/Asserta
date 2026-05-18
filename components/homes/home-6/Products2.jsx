@@ -9,13 +9,15 @@ import AddtoCart from "@/components/common/AddtoCart";
 import QuickView from "@/components/common/QuickView";
 import AddtoCompare from "@/components/common/AddtoCompare";
 import { Pagination } from "swiper/modules";
+import { useTranslations } from "next-intl";
 export default function Products2() {
+  const t = useTranslations("home");
   return (
     <section>
       <div className="container-full-3 pe-0">
         <div className="sect-top">
           <h2 className="s-title font-2 text-capitalize wow fadeInUp">
-            <span className="fst-italic">Fresh Finds,</span> just In
+            <span className="fst-italic">{t("freshFinds")}</span> {t("freshFinds2")}
           </h2>
         </div>
         <Swiper
@@ -91,15 +93,13 @@ export default function Products2() {
                         product.oldPrice ? "text-secondary" : ""
                       } h5`}
                     >
-                      $
-                      {product.price.toLocaleString(undefined, {
+                      ₪{product.price.toLocaleString(undefined, {
                         minimumFractionDigits: 2,
                       })}
                     </span>
                     {product.oldPrice && (
                       <span className="price-old fw-normal">
-                        $
-                        {product.oldPrice.toLocaleString(undefined, {
+                        ₪{product.oldPrice.toLocaleString(undefined, {
                           minimumFractionDigits: 2,
                         })}
                       </span>

@@ -11,13 +11,14 @@ import QuantitySelect from "../common/QuantitySelect";
 import AddtoWishlist from "../common/AddtoWishlist";
 import AddtoCompare from "../common/AddtoCompare";
 import SizePicker from "./SizeSelect";
+import { useTranslations } from "next-intl";
 export default function Details1({ product }) {
   const [activeColor, setActiveColor] = useState("gold");
   const [quantity, setQuantity] = useState(1);
+  const t = useTranslations("common");
   const {
     addProductToCart,
     isAddedToCartProducts,
-
     cartProducts,
     updateQuantity,
   } = useContextElement();
@@ -65,11 +66,11 @@ export default function Details1({ product }) {
                     <div className="product-info-price">
                       <div className="price-wrap">
                         <span className="price-new price-on-sale h4">
-                          ${product.price.toFixed(2)}
+                          ₪{product.price.toFixed(2)}
                         </span>
                         {product.oldPrice && (
                           <span className="price-old compare-at-price fw-normal h6">
-                            ${product.oldPrice.toFixed(2)}
+                            ₪{product.oldPrice.toFixed(2)}
                           </span>
                         )}
                       </div>
@@ -137,11 +138,11 @@ export default function Details1({ product }) {
                         className="tf-btn btn-fill-2 text-uppercase fw-medium animate-btn"
                       >
                         {isAddedToCartProducts(product.id)
-                          ? "already added"
-                          : "add to bag"}
+                          ? t("addedToCart")
+                          : t("addToCart")}
                         <i className="icon-minus d-none d-sm-block" />
                         <span className="price-add d-none d-sm-block">
-                          {(product.price * quantity).toFixed(2)}
+                          ₪{(product.price * quantity).toFixed(2)}
                         </span>
                       </a>
                       <div className="group-btn-action">
@@ -162,7 +163,7 @@ export default function Details1({ product }) {
                       href={`/checkout`}
                       className="tf-btn w-100 text-uppercase fw-medium"
                     >
-                      buy it now
+                      {t("buyNow")}
                     </Link>
                   </div>
                   <div className="tf-product-share">

@@ -10,8 +10,11 @@
     "sale": "Sale",
     "moreComing": "More Coming Soon..."
   },
+
   "topbar": {
-    "delivery": "Free standard delivery for all orders over ₪200"
+    "delivery": "Free standard delivery for all orders over ₪200",
+    "shipping_speed": "Fast shipping within 3 business days (for items in stock)",
+    "refund_policy": "Full refund up to 30 days - no questions asked"
   },
   "footerMenu": {
     "newCollection": "New Collection",
@@ -87,7 +90,9 @@
     "search": "Search",
     "searchPlaceholder": "Search products...",
     "noResults": "No results found",
-    "currency": "₪"
+    "currency": "₪",
+    "verified": "Verified",
+    "alreadyAdded": "Already Added"
   },
   "home": {
     "featuredCollections": "Featured Collections",
@@ -95,7 +100,13 @@
     "bestSellers": "Best Sellers",
     "testimonials": "What Our Customers Say",
     "lookbook": "Lookbook",
-    "features_title": "Why Choose Asserta"
+    "features_title": "Why Choose Asserta",
+    "freshFinds": "Fresh Finds,",
+    "freshFinds2": "Just In",
+    "shopTheLook": "Shop The",
+    "shopTheLook2": "Look",
+    "giftUnder": "Gift Under ₪200",
+    "personalisedGifts": "Personalised Gifts"
   },
   "collections": {
     "anklet": "Anklet",
@@ -109,13 +120,24 @@
   },
   "features": {
     "shipping_title": "Free Shipping",
-    "shipping_desc": "On all orders over ₪200",
-    "returns_title": "Easy Returns",
-    "returns_desc": "30-day hassle-free returns",
-    "support_title": "Customer Support",
-    "support_desc": "Available 7 days a week",
-    "quality_title": "Quality Guaranteed",
-    "quality_desc": "Premium jewelry, always"
+    "shipping_desc": "Enjoy free shipping on all orders",
+    "payment_title": "Secured Payment",
+    "payment_desc": "Secured payment",
+    "returns_title": "14-Days Return",
+    "returns_desc": "Free return in 14 days",
+    "support_title": "Premium Support",
+    "support_desc": "Enjoy our support 24/7"
+  },
+  "banner": {
+    "caption": "Summer Sale",
+    "title": "Radiate Elegance,",
+    "title2": "Wear Confidence",
+    "subtitle": "Discover exquisitely crafted jewelry designed to complement your style. From timeless classics to modern statement pieces, find the perfect sparkle for every occasion.",
+    "cta": "Shop Collection"
+  },
+  "textSlider": {
+    "item1": "Black Friday Sale",
+    "item2": "New Season Essential"
   },
   "cart": {
     "title": "Shopping Cart",

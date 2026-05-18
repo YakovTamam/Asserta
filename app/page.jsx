@@ -26,17 +26,17 @@ export default function Home() {
           <Topbar3 />
           <Header1 parentClass="tf-header" />
           <Hero />
-          <TextSlider />
+          {/* <TextSlider /> */}
           <Collections />
           <Products1 />
           <Banner />
           <Collections2 />
-          <Lookbook />
-          <Products2 />
-          <Features />
+          {/* <Lookbook /> */}
+          {/* <Products2 /> */}
+          {/* <Features /> */}
           <Testimonials />
           <Footer1 />
-          <NewsLetter />
+          {/* <NewsLetter /> */}
         </div>
       </div>
     </>

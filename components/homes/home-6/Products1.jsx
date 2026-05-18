@@ -11,13 +11,15 @@ import DiscountMarquee from "@/components/common/DiscountMarquee";
 import { Navigation, Pagination } from "swiper/modules";
 import CountdownTimer from "@/components/common/Countdown";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 export default function Products1() {
+  const t = useTranslations();
   return (
     <section className="flat-spacing-9 px-xxl_15 pb-0">
       <div className="container">
         <div className="sect-top wow fadeInUp">
           <h2 className="s-title font-2 text-capitalize">
-            Best <span className="fst-italic">Sellers</span>
+            {t("home.bestSellers")}
           </h2>
           <div className="group-btn-slider type-2 ">
             <div className="nav-prev-swiper tf-sw-nav snbp35">
@@ -125,7 +127,10 @@ export default function Products1() {
                     <div className="variant-box count-down">
                       <div className="countdown-V02">
                         <div className="js-countdown">
-                          <CountdownTimer style={5} />
+                          <CountdownTimer
+                            style={5}
+                            targetDate={item.targetDate}
+                          />
                         </div>
                       </div>
                     </div>
@@ -159,18 +164,19 @@ export default function Products1() {
                         : "product-default"
                     }/${item.id}`}
                     className="name-product h5 fw-normal link text-line-clamp-2"
+                    style={{ textAlign: "right" }}
                   >
                     {item.title}
                   </Link>
                   <div className="price-wrap">
-                    <span className={`price-new h5 ${item.textColor || ""}`}>
-                      ${item.price.toFixed(2)}
-                    </span>
                     {item.oldPrice && (
                       <span className="price-old fw-normal">
-                        ${item.oldPrice.toFixed(2)}
+                        ₪{item.oldPrice.toFixed(2)}
                       </span>
                     )}
+                    <span className={`price-new h5 ${item.textColor || ""}`}>
+                      ₪{item.price.toFixed(2)}
+                    </span>
                   </div>
                 </div>
               </div>

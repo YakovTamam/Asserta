@@ -10,7 +10,9 @@ import AddtoCompare from "@/components/common/AddtoCompare";
 import { Navigation, Pagination } from "swiper/modules";
 import { useEffect, useRef } from "react";
 import { useContextElement } from "@/context/Context";
+import { useTranslations } from "next-intl";
 export default function Lookbook() {
+  const t = useTranslations();
   const { addProductToCart, isAddedToCartProducts } = useContextElement();
   const swiperRef = useRef(null);
   useEffect(() => {
@@ -98,7 +100,7 @@ export default function Lookbook() {
           </div>
           <div className="product-right wow fadeInUp" id="prd-lb">
             <h2 className="s-title font-2 text-capitalize">
-              Shop The <span className="fst-italic">Look</span>
+              {t("home.shopTheLook")} <span className="fst-italic">{t("home.shopTheLook2")}</span>
             </h2>
             <Swiper
               dir="ltr"
@@ -173,15 +175,13 @@ export default function Lookbook() {
                       </Link>
                       <div className="price-wrap">
                         <span className="price-new h5 text-secondary">
-                          $
-                          {product.price.toLocaleString(undefined, {
+                          ₪{product.price.toLocaleString(undefined, {
                             minimumFractionDigits: 2,
                           })}
                         </span>
                         {product.oldPrice && (
                           <span className="price-old fw-normal">
-                            $
-                            {product.oldPrice.toLocaleString(undefined, {
+                            ₪{product.oldPrice.toLocaleString(undefined, {
                               minimumFractionDigits: 2,
                             })}
                           </span>
@@ -207,8 +207,8 @@ export default function Lookbook() {
                         className="tf-btn hover-primary fw-medium w-100"
                       >
                         {isAddedToCartProducts(product.id)
-                          ? "Already Added"
-                          : "Add to Cart"}
+                          ? t("common.addedToCart")
+                          : t("common.addToCart")}
                       </a>
                     </div>
                   </div>

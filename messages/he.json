@@ -11,7 +11,10 @@
     "moreComing": "עוד בדרך..."
   },
   "topbar": {
-    "delivery": "משלוח חינם על כל הזמנה מעל ₪200"
+    "welcome": "הגעתם למקום הנכון - תכשיטי יוקרה בעיצוב ייחודי!",
+    "delivery": "משלוח חינם על כל הזמנה מעל ₪200",
+    "shipping_speed": "משלוחים מהירים עד 3 ימי עסקים (למוצרים הזמינים במלאי)",
+    "refund_policy": "החזר כספי מלא עד 30 ימים - בלי לשאול שאלות"
   },
   "footerMenu": {
     "newCollection": "קולקציה חדשה",
@@ -87,7 +90,9 @@
     "search": "חיפוש",
     "searchPlaceholder": "חפש מוצרים...",
     "noResults": "לא נמצאו תוצאות",
-    "currency": "₪"
+    "currency": "₪",
+    "verified": "מאומת",
+    "alreadyAdded": "כבר בעגלה"
   },
   "home": {
     "featuredCollections": "קולקציות נבחרות",
@@ -95,7 +100,13 @@
     "bestSellers": "הנמכרים ביותר",
     "testimonials": "מה הלקוחות אומרים",
     "lookbook": "לוקבוק",
-    "features_title": "למה לבחור ב-Asserta"
+    "features_title": "למה לבחור ב-Asserta",
+    "freshFinds": "חדש אצלנו,",
+    "freshFinds2": "הגיע זה עתה",
+    "shopTheLook": "קני את",
+    "shopTheLook2": "הלוק",
+    "giftUnder": "מתנות עד ₪200",
+    "personalisedGifts": "מתנות אישיות"
   },
   "collections": {
     "anklet": "קרסוליות",
@@ -109,13 +120,24 @@
   },
   "features": {
     "shipping_title": "משלוח חינם",
-    "shipping_desc": "על כל הזמנה מעל ₪200",
-    "returns_title": "החזרה קלה",
-    "returns_desc": "תוך 30 יום ללא שאלות",
-    "support_title": "שירות לקוחות",
-    "support_desc": "זמינים 7 ימים בשבוע",
-    "quality_title": "איכות מובטחת",
-    "quality_desc": "תכשיטים מהמיטב"
+    "shipping_desc": "משלוח חינם על כל ההזמנות",
+    "payment_title": "תשלום מאובטח",
+    "payment_desc": "תשלום מאובטח",
+    "returns_title": "14 יום להחזרה",
+    "returns_desc": "החזרה חינם תוך 14 יום",
+    "support_title": "תמיכה מעולה",
+    "support_desc": "זמינים עבורך 24/7"
+  },
+  "banner": {
+    "caption": "מבצעי קיץ",
+    "title": "הקריני אלגנטיות,",
+    "title2": "ועידני ביטחון",
+    "subtitle": "גלי תכשיטים מעוצבים בקפידה שמשלימים את הסגנון שלך. עם תכשיטים בעיצוב קלאסי ועד מודרני — בטוח שתמצאי את הנצנוץ המושלם עבורך.",
+    "cta": "לקולקציה"
+  },
+  "textSlider": {
+    "item1": "מבצע מיוחד",
+    "item2": "חדש לעונה"
   },
   "cart": {
     "title": "עגלת קניות",

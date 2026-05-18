@@ -12,19 +12,20 @@
 @include meta.load-css("app.scss");
 
 :root {
-  --bs-link-color: inherit;
-  --bs-link-color-rgb: inherit;
+  --bs-link-color: currentColor;
+  --bs-link-color-rgb: 0, 0, 0;
   --bs-link-decoration: none;
-  --bs-link-hover-color: inherit;
+  --bs-link-hover-color: currentColor;
   --bs-link-hover-decoration: none;
+  --bs-link-opacity: 1;
 }
 
 a {
-  color: inherit;
-  text-decoration: none;
+  color: inherit !important;
+  text-decoration: none !important;
   &:hover {
-    color: inherit;
-    text-decoration: none;
+    color: inherit !important;
+    text-decoration: none !important;
   }
 }
 .infiniteSlider {
@@ -102,4 +103,64 @@ picture.jarallax-img img {
 .nav-next-swiper,
 .nav-prev-swiper {
   cursor: pointer;
+}
+
+/* ── Hebrew (RTL) typography ── */
+html[dir="rtl"] {
+  body,
+  input,
+  button,
+  textarea,
+  select,
+  p,
+  span,
+  li,
+  td,
+  th {
+    font-family: "Frank Ruhl Libre", serif;
+    font-weight: 400;
+    letter-spacing: 0;
+  }
+
+  h1, h2, h3, h4, h5, h6,
+  .s-title,
+  .heading,
+  .font-2,
+  .name-product,
+  .product-info-name,
+  .title,
+  .name,
+  .caption {
+    font-family: "Frank Ruhl Libre", serif;
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+
+  .text-hero-2,
+  .text-main-9 {
+    font-family: "Frank Ruhl Libre", serif;
+    font-weight: 700;
+  }
+}
+
+/* ── English (LTR) typography ── */
+html[dir="ltr"] {
+  body,
+  p,
+  span,
+  li {
+    font-family: "Cormorant Garamond", serif;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+  }
+
+  h1, h2, h3, h4, h5, h6,
+  .s-title,
+  .heading,
+  .font-2,
+  .name-product {
+    font-family: "Cormorant Garamond", serif;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
 }

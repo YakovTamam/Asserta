@@ -1,7 +1,10 @@
+"use client";
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 export default function Collections2() {
+  const t = useTranslations();
   return (
     <div className="flat-spacing-3 pb-0">
       <div className="container-full-2">
@@ -17,12 +20,12 @@ export default function Collections2() {
               />
             </Link>
             <div className="content">
-              <h3 className="title text-uppercase">gift under $200</h3>
+              <h3 className="title text-uppercase">{t("home.giftUnder")}</h3>
               <Link
                 href={`/shop-default`}
                 className="tf-btn btn-def-2 type-black"
               >
-                Shop Now
+                {t("common.shopNow")}
                 <i className="icon icon-arrow-top-right" />
               </Link>
             </div>
@@ -38,12 +41,12 @@ export default function Collections2() {
               />
             </Link>
             <div className="content">
-              <h3 className="title text-uppercase">personalised gifts</h3>
+              <h3 className="title text-uppercase">{t("home.personalisedGifts")}</h3>
               <Link
                 href={`/shop-default`}
                 className="tf-btn btn-def-2 type-black"
               >
-                Shop Now
+                {t("common.shopNow")}
                 <i className="icon icon-arrow-top-right" />
               </Link>
             </div>

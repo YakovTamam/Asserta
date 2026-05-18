@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Nav from "./Nav";
+import LangToggle from "@/components/common/LangToggle";
 export default function Header1({ parentClass = "tf-header line-bt-2" }) {
   return (
     <header className={parentClass}>
@@ -71,6 +72,9 @@ export default function Header1({ parentClass = "tf-header line-bt-2" }) {
                   <i className="icon icon-cart" />
                   <span className="count-notice" />
                 </a>
+              </li>
+              <li className="d-inline-flex align-items-center">
+                <LangToggle />
               </li>
             </ul>
           </div>

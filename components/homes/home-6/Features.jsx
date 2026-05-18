@@ -3,8 +3,17 @@ import { boxFeatures } from "@/data/features";
 import React from "react";
 import { Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { useTranslations } from "next-intl";
+
+const iconKeyMap = {
+  "icon-box": "shipping",
+  "icon-credit-card": "payment",
+  "icon-return": "returns",
+  "icon-headphone": "support",
+};
 
 export default function Features() {
+  const t = useTranslations("features");
   return (
     <div className="themesFlat">
       <div className="container">
@@ -43,8 +52,8 @@ export default function Features() {
                     <i className={item.iconClass} />
                   </span>
                   <div className="content">
-                    <h5 className="title">{item.title}</h5>
-                    <p className="text">{item.text}</p>
+                    <h5 className="title">{t(`${iconKeyMap[item.iconClass]}_title`)}</h5>
+                    <p className="text">{t(`${iconKeyMap[item.iconClass]}_desc`)}</p>
                   </div>
                 </div>
               </SwiperSlide>

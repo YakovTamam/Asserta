@@ -22,7 +22,10 @@ export default function Banner() {
           <div className="bn-content">
             <div className="container">
               <div className="col-md-5 offset-md-7">
-                <div className="wrap wow fadeInUp">
+                <div
+                  className="wrap wow fadeInUp"
+                  style={{ padding: " 0 20px" }}
+                >
                   <h6 className="caption fw-normal">{t("caption")}</h6>
                   <p className="title text-hero-2 font-2">
                     {t("title")} <br className="d-none d-xl-block" />

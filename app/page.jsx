@@ -30,7 +30,7 @@ export default function Home() {
           <Collections />
           <Products1 />
           <Banner />
-          <Collections2 />
+          {/* <Collections2 /> */}
           {/* <Lookbook /> */}
           {/* <Products2 /> */}
           {/* <Features /> */}

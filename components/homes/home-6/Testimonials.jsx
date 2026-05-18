@@ -12,7 +12,7 @@ export default function Testimonials() {
     <section className="themesFlat">
       <div
         className="flat-spacing-7 parallaxie"
-        style={{ backgroundImage: 'url("/images/section/bg-3.jpg")' }}
+        style={{ backgroundImage: 'url("/images/background.png")' }}
       >
         <div className="container">
           <div className="sect-top align-items-end wow fadeInUp">
@@ -20,16 +20,17 @@ export default function Testimonials() {
               {t("home.testimonials")}
             </h2>
             <div className="group-btn-slider style-white">
-              <div className="nav-prev-swiper tf-sw-nav snbp38">
-                <i className="icon-arrow-left" />
-              </div>
               <div className="nav-next-swiper tf-sw-nav snbn38">
                 <i className="icon-arrow-right" />
+              </div>
+              <div className="nav-prev-swiper tf-sw-nav snbp38">
+                <i className="icon-arrow-left" />
               </div>
             </div>
           </div>
           <Swiper
             className="swiper tf-swiper"
+            loop={true}
             breakpoints={{
               0: { slidesPerView: 1 },
               575: {
@@ -109,9 +110,9 @@ export default function Testimonials() {
                     </div>
                   </div>
                   <div className="box_testimonial-item">
-                    <div className="image-item">
+                    {/* <div className="image-item">
                       <Image alt="" src={item.image} width={714} height={900} />
-                    </div>
+                    </div> */}
                     <div className="info-item">
                       <a
                         href="#"

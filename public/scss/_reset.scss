@@ -276,7 +276,6 @@ th {
   width: 100%;
   max-width: 100%;
   margin: 0 auto;
-  padding: 0px 15px;
 
   @include res(xxl, min) {
     padding-left: 30px;
@@ -1543,6 +1542,8 @@ a {
 .tf-swiper {
   .swiper-slide {
     height: auto;
+    direction: rtl;
+    text-align: center;
 
     > * {
       height: 100%;

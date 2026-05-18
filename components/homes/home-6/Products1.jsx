@@ -22,11 +22,11 @@ export default function Products1() {
             {t("home.bestSellers")}
           </h2>
           <div className="group-btn-slider type-2 ">
-            <div className="nav-prev-swiper tf-sw-nav snbp35">
-              <i className="icon-arrow-left" />
-            </div>
             <div className="nav-next-swiper tf-sw-nav snbn35">
               <i className="icon-arrow-right" />
+            </div>
+            <div className="nav-prev-swiper tf-sw-nav snbp35">
+              <i className="icon-arrow-left" />
             </div>
           </div>
         </div>
@@ -54,8 +54,8 @@ export default function Products1() {
             el: ".spd35",
           }}
           navigation={{
-            prevEl: ".snbp35",
             nextEl: ".snbn35",
+            prevEl: ".snbp35",
           }}
         >
           {products11.map((item) => (

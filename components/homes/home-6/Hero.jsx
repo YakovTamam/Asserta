@@ -5,11 +5,35 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import Link from "next/link";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-
-const slideImages = [
-  { image: "/images/slider/slider-10.jpg", imageWidth: 2790, imageHeight: 1226, buttonClass: "tf-btn type-large style-white-2" },
-  { image: "/images/slider/slider-12.jpg", imageWidth: 2790, imageHeight: 1226, buttonClass: "tf-btn type-large", titleClass: "text-main" },
-  { image: "/images/slider/slider-11.jpg", imageWidth: 2790, imageHeight: 1226, buttonClass: "tf-btn type-large style-white-2" },
+const heroSlider = [
+  {
+    image: "/images/hero1.png",
+    cta: "לגילוי הקולקציה",
+    title: "המתנה המושלמת",
+    subtitle: "משלוח מהיר עד הבית",
+    imageWidth: 2790,
+    imageHeight: 1226,
+    buttonClass: "tf-btn type-large style-white-2",
+  },
+  {
+    image: "/images/hero2.png",
+    imageWidth: 2790,
+    imageHeight: 1226,
+    title: "הרגעים שלכם",
+    subtitle: "הניצוץ שלנו",
+    cta: "להצצה בעיצובים",
+    buttonClass: "tf-btn type-large style-white-3",
+    titleClass: "text-main",
+  },
+  {
+    image: "/images/hero3.png",
+    imageWidth: 2790,
+    imageHeight: 1226,
+    title: "המתנה המושלמת",
+    subtitle: "משלוח מהיר עד הבית",
+    cta: "לבחירת מתנה",
+    buttonClass: "tf-btn type-large style-white-2",
+  },
 ];
 
 const slideTitles = ["slide1", "slide2", "slide3"];
@@ -24,30 +48,44 @@ export default function Hero() {
           dir="ltr"
           className="swiper tf-swiper sw-slide-show slider_effect_fade"
           loop
-          autoplay={{ delay: 3000 }}
+          autoplay={{ delay: 13000 }}
           modules={[Autoplay, EffectFade, Pagination]}
           pagination={{ clickable: true, el: ".spd33" }}
         >
-          {slideImages.map((slide, index) => (
+          {heroSlider.map((slide, index) => (
             <SwiperSlide className="swiper-slide" key={index}>
               <div className="slider_wrap">
                 <div className="sld-image">
-                  <Image src={slide.image} alt="" className="lazyload" width={slide.imageWidth} height={slide.imageHeight} />
+                  <Image
+                    src={slide.image}
+                    alt=""
+                    className="lazyload"
+                    width={slide.imageWidth}
+                    height={slide.imageHeight}
+                  />
                 </div>
                 <div className="sld-content">
                   <div className="container">
                     <div className="row">
                       <div className="col-12">
-                        <div className="content-sld" style={{ textAlign: "start" }}>
-                          <p className={`title-sld-2 font-2 fade-item fade-item-1 ${slide.titleClass || ""}`}>
-                            <span className="fst-italic">{t(`${slideTitles[index]}_title`)}</span>
+                        <div
+                          className="content-sld"
+                          style={{ textAlign: "start" }}
+                        >
+                          <p
+                            className={`title-sld-2 font-2 fade-item fade-item-1 ${slide.titleClass || ""}`}
+                          >
+                            <span className="fst-italic">{slide.title}</span>
                             <br />
-                            {t(`${slideTitles[index]}_title2`)}
+                            {slide.subtitle}
                           </p>
                           <div className="fade-item fade-item-2">
-                            <Link href="/shop-collection-list" className={slide.buttonClass}>
-                              {t("cta")}
-                              <i className="icon-arrow-right fs-24" />
+                            <Link
+                              href="/shop-collection-list"
+                              className={slide.buttonClass}
+                            >
+                              {slide.cta}
+                              <i className="icon-arrow-left fs-24" />
                             </Link>
                           </div>
                         </div>

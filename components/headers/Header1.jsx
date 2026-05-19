@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Nav from "./Nav";
+import StoriesHeaderSlot from "./StoriesHeaderSlot";
 
 export default function Header1({ parentClass = "tf-header line-bt-2" }) {
   return (
@@ -95,6 +96,7 @@ export default function Header1({ parentClass = "tf-header line-bt-2" }) {
           </div>
         </div>
       </div>
+      <StoriesHeaderSlot />
     </header>
   );
 }

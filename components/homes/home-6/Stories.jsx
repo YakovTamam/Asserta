@@ -205,6 +205,22 @@ export default function Stories({ isSticky = true }) {
     return () => obs.disconnect();
   }, [isSticky]);
 
+  /* expose global opener for header slot */
+  useEffect(() => {
+    window.__openStory = (idx, mIdx = 0) => {
+      clearTimeout(timerRef.current);
+      setActiveIdx(idx);
+      setMediaIdx(mIdx ?? 0);
+      setProgressKey(k => k + 1);
+    };
+    return () => { delete window.__openStory; };
+  }, []);
+
+  /* broadcast viewed state to header slot */
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent("stories:viewed", { detail: [...viewed] }));
+  }, [viewed]);
+
   function openStory(idx, mIdx = 0) {
     clearTimeout(timerRef.current);
     setActiveIdx(idx);

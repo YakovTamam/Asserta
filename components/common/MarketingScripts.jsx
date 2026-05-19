@@ -10,7 +10,7 @@ export default async function MarketingScripts() {
     // Table may not exist yet — silently skip
   }
 
-  const { gtm_id, fb_pixel_id, clarity_id, hotjar_id } = settings;
+  const { gtm_id, fb_pixel_id, clarity_id, ga4_id } = settings;
 
   return (
     <>
@@ -61,18 +61,17 @@ export default async function MarketingScripts() {
         `}</Script>
       )}
 
-      {/* Hotjar */}
-      {hotjar_id && (
-        <Script id="hotjar" strategy="afterInteractive">{`
-          (function(h,o,t,j,a,r){
-            h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
-            h._hjSettings={hjid:${hotjar_id},hjsv:6};
-            a=o.getElementsByTagName('head')[0];
-            r=o.createElement('script');r.async=1;
-            r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
-            a.appendChild(r);
-          })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
-        `}</Script>
+      {/* Google Analytics 4 */}
+      {ga4_id && (
+        <>
+          <Script src={`https://www.googletagmanager.com/gtag/js?id=${ga4_id}`} strategy="afterInteractive" />
+          <Script id="ga4" strategy="afterInteractive">{`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${ga4_id}');
+          `}</Script>
+        </>
       )}
     </>
   );

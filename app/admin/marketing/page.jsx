@@ -39,13 +39,13 @@ const FIELDS = [
     hint: "נמצא ב-clarity.microsoft.com → Settings → Project ID",
   },
   {
-    section: "Hotjar",
-    icon: "🌡️",
-    color: "#fd3a5c",
-    key: "hotjar_id",
-    label: "Hotjar Site ID",
-    placeholder: "1234567",
-    hint: "נמצא ב-hotjar.com → Settings → Tracking Code → Site ID",
+    section: "Google Analytics 4",
+    icon: "📈",
+    color: "#e37400",
+    key: "ga4_id",
+    label: "Measurement ID",
+    placeholder: "G-XXXXXXXXXX",
+    hint: "נמצא ב-analytics.google.com → Admin → Data Streams → Measurement ID",
   },
 ];
 

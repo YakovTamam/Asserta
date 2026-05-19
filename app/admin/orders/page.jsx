@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase-browser";
 
 const C = {
@@ -79,8 +80,14 @@ export default function OrdersPage() {
   const [selected, setSelected] = useState(null);
   const [filter,   setFilter]   = useState("all");
   const supabase = createClient();
+  const searchParams = useSearchParams();
 
   useEffect(() => { fetchOrders(); }, []);
+
+  useEffect(() => {
+    const s = searchParams.get("status");
+    if (s) setFilter(s);
+  }, [searchParams]);
 
   async function fetchOrders() {
     const { data } = await supabase

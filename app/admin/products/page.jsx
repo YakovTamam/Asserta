@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase-browser";
 
 /* ── Design tokens ─────────────────────────────── */
@@ -75,8 +76,13 @@ export default function ProductsPage() {
   const [search,     setSearch]     = useState("");
   const fileRef = useRef(null);
   const supabase = createClient();
+  const searchParams = useSearchParams();
 
   useEffect(() => { fetchAll(); }, []);
+
+  useEffect(() => {
+    if (searchParams.get("new") === "true") openNew();
+  }, [searchParams]);
 
   async function fetchAll() {
     const [{ data: prods }, { data: cats }] = await Promise.all([

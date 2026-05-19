@@ -1,16 +1,18 @@
 .shell {
   display: flex;
   min-height: 100vh;
-  background: #f7f7f8;
+  background: #f1f5f9;
   font-family: system-ui, -apple-system, sans-serif;
   direction: rtl;
   overflow-x: hidden;
 }
 
-/* ── Desktop sidebar ──────────────────────── */
+/* ───────────────────────────────────────
+   Desktop sidebar
+─────────────────────────────────────── */
 .sidebar {
   width: 220px;
-  background: #111;
+  background: #0f172a;
   color: #fff;
   display: flex;
   flex-direction: column;
@@ -25,126 +27,330 @@
 .content {
   margin-right: 220px;
   flex: 1;
-  padding: 32px;
+  padding: 28px 28px 28px;
   min-height: 100vh;
   box-sizing: border-box;
 }
 
 .logo {
-  padding: 24px;
-  border-bottom: 1px solid #222;
+  padding: 22px 20px;
+  border-bottom: 1px solid #1e293b;
 }
 
 .logoTitle {
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 17px;
+  font-weight: 800;
   letter-spacing: 3px;
   margin: 0;
+  color: #fff;
 }
 
 .logoSub {
-  font-size: 11px;
-  color: #666;
+  font-size: 10px;
+  color: #475569;
   margin: 4px 0 0;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
 }
 
 .nav {
   flex: 1;
-  padding: 16px 0;
+  padding: 12px 0;
+  overflow-y: auto;
 }
 
+/* Simple nav link (e.g. Dashboard) */
 .navLink {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 13px 24px;
-  color: #888;
+  gap: 10px;
+  padding: 11px 20px;
+  color: #94a3b8;
   text-decoration: none;
-  font-size: 14px;
+  font-size: 13.5px;
   border-right: 3px solid transparent;
   transition: all 0.15s;
 }
 
-.navLink:hover {
-  color: #fff;
-  background: #1a1a1a;
+.navLink:hover { color: #fff; background: #1e293b; }
+.navLinkActive  { color: #fff !important; background: #1e293b; border-right-color: #fff; }
+
+.navIcon { font-size: 16px; line-height: 1; width: 22px; flex-shrink: 0; }
+
+/* Section label (non-clickable header in desktop sidebar) */
+.sectionLabel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px 6px;
+  color: #475569;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-top: 8px;
 }
 
-.navLinkActive {
-  color: #fff !important;
-  background: #222;
-  border-right-color: #fff;
+.sectionLabelActive { color: #94a3b8; }
+
+/* Sub-links in desktop sidebar */
+.subLink {
+  display: block;
+  padding: 8px 20px 8px 20px;
+  padding-right: 52px;
+  color: #64748b;
+  text-decoration: none;
+  font-size: 13px;
+  transition: all 0.15s;
+  border-right: 3px solid transparent;
 }
+
+.subLink:hover  { color: #cbd5e1; background: #1e293b; }
+.subLinkActive  { color: #fff !important; background: #1e293b; border-right-color: #fff; }
 
 .logoutBtn {
   margin: 16px;
   padding: 10px;
   background: none;
-  border: 1px solid #333;
-  color: #888;
+  border: 1px solid #1e293b;
+  color: #475569;
   border-radius: 8px;
   cursor: pointer;
   font-size: 13px;
   width: calc(100% - 32px);
   transition: all 0.15s;
+  font-family: inherit;
 }
 
-.logoutBtn:hover {
-  border-color: #555;
-  color: #aaa;
-}
+.logoutBtn:hover { border-color: #334155; color: #94a3b8; }
 
-/* ── Mobile — hidden on desktop ───────────── */
-.topBar   { display: none; }
-.bottomNav { display: none; }
+/* ───────────────────────────────────────
+   Mobile hidden by default
+─────────────────────────────────────── */
+.topBar     { display: none; }
+.bottomNav  { display: none; }
+.overlay    { display: none; }
+.drawer     { display: none; }
 
-/* ── Mobile breakpoint ────────────────────── */
+/* ───────────────────────────────────────
+   Mobile breakpoint (≤ 767px)
+─────────────────────────────────────── */
 @media (max-width: 767px) {
-  .shell {
-    flex-direction: column;
-  }
-
-  .sidebar {
-    display: none;
-  }
+  .shell { flex-direction: column; }
+  .sidebar { display: none; }
 
   .content {
     margin-right: 0;
-    padding: 16px 16px 96px;
+    padding: 16px 16px 100px;
     min-height: auto;
   }
 
-  /* Sticky top bar */
+  /* ── Top bar ── */
   .topBar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #111;
+    background: #0f172a;
     color: #fff;
-    padding: 14px 20px;
+    padding: 0 16px;
+    height: 54px;
     position: sticky;
     top: 0;
     z-index: 200;
+    flex-shrink: 0;
   }
 
   .topBarTitle {
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: 2px;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 2.5px;
   }
 
   .topBarLogout {
     background: none;
-    border: 1px solid #444;
-    color: #aaa;
-    padding: 7px 14px;
+    border: 1px solid #334155;
+    color: #94a3b8;
+    padding: 6px 13px;
     border-radius: 6px;
     font-size: 12px;
     cursor: pointer;
+    font-family: inherit;
   }
 
-  /* Fixed bottom nav */
+  /* ── Hamburger ── */
+  .hamburger {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+  }
+
+  .hamburger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: #fff;
+    border-radius: 2px;
+  }
+
+  /* ── Overlay ── */
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 290;
+    backdrop-filter: blur(2px);
+  }
+
+  .overlayVisible { display: block; }
+
+  /* ── Drawer ── */
+  .drawer {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 280px;
+    height: 100vh;
+    background: #0f172a;
+    z-index: 300;
+    overflow-y: auto;
+    transform: translateX(100%);
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .drawerOpen { transform: translateX(0); }
+
+  .drawerHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px;
+    border-bottom: 1px solid #1e293b;
+    flex-shrink: 0;
+  }
+
+  .drawerTitle {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: #fff;
+  }
+
+  .drawerClose {
+    background: none;
+    border: none;
+    color: #64748b;
+    font-size: 26px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 4px;
+    font-family: inherit;
+  }
+
+  .drawerNav {
+    flex: 1;
+    padding: 10px 0;
+    overflow-y: auto;
+  }
+
+  /* Simple item (Dashboard) */
+  .drawerItem {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 15px;
+    border-right: 3px solid transparent;
+    transition: all 0.15s;
+  }
+
+  .drawerItem:hover       { color: #fff; background: #1e293b; }
+  .drawerItemActive       { color: #fff !important; background: #1e293b; border-right-color: #fff; }
+  .drawerIcon             { font-size: 18px; width: 26px; flex-shrink: 0; }
+
+  /* Section button (accordion toggle) */
+  .drawerSection {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 14px 20px;
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 15px;
+    font-family: inherit;
+    cursor: pointer;
+    text-align: right;
+    border-right: 3px solid transparent;
+    transition: all 0.15s;
+  }
+
+  .drawerSection:hover       { color: #fff; background: #1e293b; }
+  .drawerSectionActive       { color: #e2e8f0; }
+
+  .chevron {
+    font-size: 20px;
+    line-height: 1;
+    color: #475569;
+    transition: transform 0.2s;
+    display: inline-block;
+  }
+
+  .chevronOpen { transform: rotate(90deg); }
+
+  /* Sub-items container — hidden by default, animated open */
+  .drawerChildren {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease;
+  }
+
+  .drawerChildrenOpen { max-height: 400px; }
+
+  /* Individual child link */
+  .drawerChild {
+    display: block;
+    padding: 11px 20px 11px 20px;
+    padding-right: 58px;
+    color: #64748b;
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.15s;
+    border-right: 3px solid transparent;
+  }
+
+  .drawerChild:hover   { color: #cbd5e1; background: #1e293b; }
+  .drawerChildActive   { color: #fff; background: #1e293b; border-right-color: #fff; }
+  .drawerChildNew      { color: #38bdf8; }
+  .drawerChildNew:hover { color: #7dd3fc; background: #1e293b; }
+
+  /* Logout inside drawer */
+  .drawerLogoutBtn {
+    margin: 16px;
+    padding: 12px;
+    background: none;
+    border: 1px solid #1e293b;
+    color: #64748b;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: inherit;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+
+  .drawerLogoutBtn:hover { border-color: #334155; color: #94a3b8; }
+
+  /* ── Bottom nav ── */
   .bottomNav {
     display: flex;
     position: fixed;
@@ -152,10 +358,10 @@
     right: 0;
     left: 0;
     background: #fff;
-    border-top: 1px solid #ececec;
+    border-top: 1px solid #e2e8f0;
     z-index: 200;
     padding-bottom: env(safe-area-inset-bottom, 0px);
-    box-shadow: 0 -2px 12px rgba(0,0,0,0.07);
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
   }
 
   .bottomNavItem {
@@ -164,26 +370,23 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 10px 4px;
+    padding: 9px 4px;
     text-decoration: none;
-    color: #bbb;
+    color: #94a3b8;
     font-size: 10px;
     gap: 3px;
     transition: color 0.15s;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
   }
 
-  .bottomNavItem.active,
-  .bottomNavItem:global(.active) {
-    color: #111;
-  }
+  .bottomNavItemActive { color: #0f172a; }
 
-  .bottomNavIcon {
-    font-size: 20px;
-    line-height: 1;
-  }
+  .bottomNavBtn { color: #94a3b8; }
+  .bottomNavBtn:hover { color: #0f172a; }
 
-  .bottomNavLabel {
-    font-size: 10px;
-    font-weight: 500;
-  }
+  .bottomNavIcon  { font-size: 19px; line-height: 1; }
+  .bottomNavLabel { font-size: 10px; font-weight: 500; }
 }

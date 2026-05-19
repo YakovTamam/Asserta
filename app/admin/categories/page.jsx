@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase-browser";
 
 const C = {
@@ -21,8 +22,13 @@ export default function CategoriesPage() {
   const [showForm,   setShowForm]   = useState(false);
   const fileRef = useRef(null);
   const supabase = createClient();
+  const searchParams = useSearchParams();
 
   useEffect(() => { fetchCategories(); }, []);
+
+  useEffect(() => {
+    if (searchParams.get("new") === "true") setShowForm(true);
+  }, [searchParams]);
 
   async function fetchCategories() {
     const { data } = await supabase.from("categories").select("*").order("name_he");

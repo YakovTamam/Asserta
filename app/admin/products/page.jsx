@@ -139,7 +139,7 @@ export default function ProductsPage() {
   }
 
   async function handleSave() {
-    if (!form.title_he || !form.price) return;
+    if (!form.title_he || !form.price || form.category_ids.length === 0) return;
     setSaving(true);
     const payload = { ...form, price: parseFloat(form.price), old_price: form.old_price ? parseFloat(form.old_price) : null, category_id: form.category_ids[0] || null };
     if (editId) {
@@ -380,9 +380,14 @@ export default function ProductsPage() {
           </div>
 
           {/* Actions */}
+          {form.category_ids.length === 0 && (
+            <div style={{ padding: "12px 16px", background: "#fef9c3", border: "1px solid #fde68a", borderRadius: 10, fontSize: 13, color: "#92400e", marginBottom: 10, textAlign: "center" }}>
+              יש לבחור קטגוריה אחת לפחות לפני השמירה
+            </div>
+          )}
           <div style={{ display: "flex", gap: 10, position: "sticky", bottom: 16 }}>
             <button onClick={() => setStep(1)} style={{ padding: 15, background: "#f1f5f9", color: C.primary, border: "none", borderRadius: 12, fontSize: 15, fontWeight: 600, cursor: "pointer", minWidth: 80 }}>→ חזור</button>
-            <button onClick={handleSave} disabled={saving} style={{ flex: 1, padding: 15, background: C.primary, color: "#fff", border: "none", borderRadius: 12, fontSize: 16, fontWeight: 700, cursor: "pointer", opacity: saving ? 0.7 : 1 }}>
+            <button onClick={handleSave} disabled={saving || form.category_ids.length === 0} style={{ flex: 1, padding: 15, background: C.primary, color: "#fff", border: "none", borderRadius: 12, fontSize: 16, fontWeight: 700, cursor: "pointer", opacity: (saving || form.category_ids.length === 0) ? 0.4 : 1 }}>
               {saving ? "שומר..." : editId ? "✓ עדכן מוצר" : "✓ שמור מוצר"}
             </button>
           </div>

@@ -44,6 +44,12 @@ const NAV = [
       { href: "/admin/orders?status=shipped", label: "נשלח" },
     ],
   },
+  {
+    id: "docs",
+    label: "מדריך למשתמש",
+    icon: "📖",
+    href: "/admin/docs",
+  },
 ];
 
 const BOTTOM = [
@@ -51,6 +57,7 @@ const BOTTOM = [
   { href: "/admin/products",   label: "מוצרים",   icon: "💍", base: "/admin/products" },
   { href: "/admin/categories", label: "קטגוריות", icon: "🏷️", base: "/admin/categories" },
   { href: "/admin/orders",     label: "הזמנות",   icon: "📦", base: "/admin/orders" },
+  { href: "/admin/docs",       label: "מדריך",    icon: "📖", base: "/admin/docs" },
 ];
 
 function isActive(pathname, base) {

@@ -254,7 +254,7 @@ export default function Stories({ isSticky = true }) {
       <style>{KF}</style>
 
       {/* ── Sticky top bar ─────────────────────────────────── */}
-      {isSticky && isStuck && !stickyDismissed && (
+      {isSticky && (isStuck || viewed.size > 0) && !stickyDismissed && (
         <div style={{
           position:"fixed", top:0, left:0, right:0, zIndex:1000,
           background:"rgba(9,11,17,0.97)", backdropFilter:"blur(16px)",

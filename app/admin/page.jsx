@@ -56,7 +56,7 @@ export default function AdminDashboard() {
       <h2 style={{ fontSize: 20, fontWeight: 700, margin: "0 0 20px", color: "#0f172a" }}>דשבורד</h2>
 
       {/* KPI row */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))", gap: 12, marginBottom: 24 }}>
         <KpiCard label="מוצרים"    value={counts.products}   icon="💍" color="#6366f1" />
         <KpiCard label="הזמנות"    value={counts.orders}     icon="📦" color="#f59e0b" />
         <KpiCard label="קטגוריות"  value={counts.categories} icon="🏷️" color="#10b981" />

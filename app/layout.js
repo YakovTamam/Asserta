@@ -4,7 +4,6 @@ import LayoutWrapper from "@/components/common/LayoutWrapper";
 import "../public/scss/main.scss";
 import "photoswipe/dist/photoswipe.css";
 import ScrollTop from "@/components/common/ScrollTop";
-import Toolbar from "@/components/common/Toolbar";
 import Context from "@/context/Context";
 import Compare from "@/components/modals/Compare";
 import Login from "@/components/modals/Login";
@@ -45,7 +44,6 @@ export default async function RootLayout({ children }) {
           <LayoutWrapper>
             <Context>
               <div id="wrapper">{children}</div>
-              <Toolbar />
               <ScrollTop />
               <Compare />
               <Login />

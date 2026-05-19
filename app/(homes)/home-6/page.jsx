@@ -12,6 +12,7 @@ import Products1 from "@/components/homes/home-6/Products1";
 import Products2 from "@/components/homes/home-6/Products2";
 import Testimonials from "@/components/homes/home-6/Testimonials";
 import TextSlider from "@/components/homes/home-6/TextSlider";
+import Stories from "@/components/homes/home-6/Stories";
 import React from "react";
 
 export const metadata = {
@@ -25,6 +26,7 @@ export default function page() {
         <Topbar3 />
         <Header1 parentClass="tf-header" />
         <Hero />
+        <Stories isSticky={true} />
         <Features />
         <Products1 />
         <Collections />

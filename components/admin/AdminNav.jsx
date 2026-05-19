@@ -51,6 +51,7 @@ const NAV = [
     base: "/admin/marketing",
     children: [
       { href: "/admin/marketing", label: "הגדרות שיווק" },
+      { href: "/admin/stories",   label: "Stories" },
     ],
   },
   {

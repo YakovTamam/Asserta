@@ -6,6 +6,7 @@ import Collections from "@/components/homes/home-6/Collections";
 import Collections2 from "@/components/homes/home-6/Collections2";
 import Features from "@/components/homes/home-6/Features";
 import Hero from "@/components/homes/home-6/Hero";
+import Stories from "@/components/homes/home-6/Stories";
 import Lookbook from "@/components/homes/home-6/Lookbook";
 import Products1 from "@/components/homes/home-6/Products1";
 import Products2 from "@/components/homes/home-6/Products2";
@@ -26,6 +27,7 @@ export default function Home() {
           <Topbar3 />
           <Header1 parentClass="tf-header" />
           <Hero />
+          <Stories isSticky={true} />
           {/* <TextSlider /> */}
           <Collections />
           <Products1 />

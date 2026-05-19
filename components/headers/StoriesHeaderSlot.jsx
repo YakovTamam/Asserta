@@ -43,7 +43,7 @@ export default function StoriesHeaderSlot() {
       borderTop:   visible ? "1px solid rgba(255,255,255,0.08)" : "none",
       direction:   "rtl",
     }}>
-      <div style={{ display:"flex", alignItems:"center", gap:10, padding:"8px 0" }}>
+      <div style={{ display:"flex", alignItems:"center", gap:10, padding:"8px 4px" }}>
         <span style={{ fontSize:10, fontWeight:700, letterSpacing:1.5, color:"rgba(255,255,255,0.4)", textTransform:"uppercase", flexShrink:0 }}>
           Stories
         </span>

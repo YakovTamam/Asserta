@@ -95,8 +95,8 @@ export default function Header1({ parentClass = "tf-header line-bt-2" }) {
             </ul>
           </div>
         </div>
+        <StoriesHeaderSlot />
       </div>
-      <StoriesHeaderSlot />
     </header>
   );
 }

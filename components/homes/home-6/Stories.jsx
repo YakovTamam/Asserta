@@ -169,12 +169,11 @@ function ProductCard({ products }) {
 
 /* ── Main component ────────────────────────────────────────── */
 export default function Stories({ isSticky = true }) {
-  const [activeIdx,        setActiveIdx]        = useState(null);
-  const [mediaIdx,         setMediaIdx]         = useState(0);
-  const [viewed,           setViewed]           = useState(new Set());
-  const [isStuck,          setIsStuck]          = useState(false);
-  const [stickyDismissed,  setStickyDismissed]  = useState(false);
-  const [progressKey,      setProgressKey]      = useState(0);
+  const [activeIdx,   setActiveIdx]   = useState(null);
+  const [mediaIdx,    setMediaIdx]    = useState(0);
+  const [viewed,      setViewed]      = useState(new Set());
+  const [isStuck,     setIsStuck]     = useState(false);
+  const [progressKey, setProgressKey] = useState(0);
 
   const sectionRef  = useRef(null);
   const timerRef    = useRef(null);
@@ -268,39 +267,6 @@ export default function Stories({ isSticky = true }) {
   return (
     <>
       <style>{KF}</style>
-
-      {/* ── Sticky top bar ─────────────────────────────────── */}
-      {isSticky && (isStuck || viewed.size > 0) && !stickyDismissed && (
-        <div style={{
-          position:"fixed", top:0, left:0, right:0, zIndex:1000,
-          background:"rgba(9,11,17,0.97)", backdropFilter:"blur(16px)",
-          borderBottom:"1px solid rgba(255,255,255,0.07)",
-          display:"flex", alignItems:"center", gap:14, padding:"9px 16px",
-          animation:"slideUpIn 0.2s ease",
-        }}>
-          <span style={{ color:"rgba(255,255,255,0.45)", fontSize:10, fontWeight:800, letterSpacing:2, textTransform:"uppercase", flexShrink:0 }}>
-            STORIES
-          </span>
-          <div style={{ display:"flex", gap:9, overflowX:"auto", flex:1, scrollbarWidth:"none" }}>
-            {DEMO.map((s, i) => (
-              <button key={s.id} onClick={() => openStory(i)}
-                style={{
-                  width:36, height:36, borderRadius:"50%", border:"none",
-                  background: viewed.has(s.id) ? "#374151" : s.avatarBg,
-                  color:"#fff", fontSize:13, fontWeight:800, cursor:"pointer", flexShrink:0,
-                  boxShadow: viewed.has(s.id) ? "none" : `0 0 0 2px #111, 0 0 0 3.5px ${s.borderColors[0]}`,
-                  opacity: viewed.has(s.id) ? 0.45 : 1, transition:"all 0.2s",
-                }}>
-                {s.initials}
-              </button>
-            ))}
-          </div>
-          <button onClick={() => setStickyDismissed(true)}
-            style={{ background:"none", border:"none", color:"rgba(255,255,255,0.4)", cursor:"pointer", fontSize:24, lineHeight:1, padding:0, flexShrink:0 }}>
-            ×
-          </button>
-        </div>
-      )}
 
       {/* ── Stories row ────────────────────────────────────── */}
       <section ref={sectionRef} style={{ background:"#fff", padding:"24px 0 18px", direction:"rtl", borderBottom:"1px solid #f1f5f9" }}>

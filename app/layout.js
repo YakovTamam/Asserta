@@ -25,6 +25,7 @@ import OrderDetails from "@/components/modals/OrderDetails";
 import AccessibilityWidget from "@/components/common/AccessibilityWidget";
 import CookieBanner from "@/components/common/CookieBanner";
 import SiteOnlyComponents from "@/components/common/SiteOnlyComponents";
+import MarketingScripts from "@/components/common/MarketingScripts";
 
 export default async function RootLayout({ children }) {
   const locale = await getLocale();
@@ -64,6 +65,7 @@ export default async function RootLayout({ children }) {
               <OrderDetails />
               <SiteOnlyComponents />
               <CookieBanner />
+              <MarketingScripts />
             </Context>
           </LayoutWrapper>
         </NextIntlClientProvider>

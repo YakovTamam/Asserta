@@ -45,6 +45,15 @@ const NAV = [
     ],
   },
   {
+    id: "marketing",
+    label: "שיווק",
+    icon: "📣",
+    base: "/admin/marketing",
+    children: [
+      { href: "/admin/marketing", label: "הגדרות שיווק" },
+    ],
+  },
+  {
     id: "docs",
     label: "מדריך למשתמש",
     icon: "📖",

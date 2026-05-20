@@ -1,193 +1,263 @@
 "use client";
-import { useState, useEffect } from "react";
-import Footer1 from "@/components/footers/Footer1";
-import Header1 from "@/components/headers/Header1";
-import Topbar3 from "@/components/headers/Topbar3";
+
+import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import AddtoWishlist from "@/components/common/AddtoWishlist";
-import AddtoCart from "@/components/common/AddtoCart";
-import QuickView from "@/components/common/QuickView";
-import { useTranslations } from "next-intl";
+import Header1 from "@/components/headers/Header1";
+import Footer1 from "@/components/footers/Footer1";
+import { DEMO_PRODUCTS, DEMO_CATEGORIES } from "@/lib/demo-products";
 
-export default function ShopPage() {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+export const metadata = {
+  title: "החנות — Asserta",
+};
+
+const styles = {
+  page: {
+    backgroundColor: "#111",
+    minHeight: "100vh",
+    direction: "rtl",
+  },
+  hero: {
+    padding: "60px 24px 32px",
+    maxWidth: 1280,
+    margin: "0 auto",
+    borderBottom: "1px solid #222",
+  },
+  heroTitle: {
+    fontSize: "clamp(28px, 5vw, 48px)",
+    fontWeight: 300,
+    color: "#fff",
+    letterSpacing: "0.04em",
+    margin: 0,
+    fontFamily: "serif",
+  },
+  heroSubtitle: {
+    color: "#888",
+    marginTop: 8,
+    fontSize: 14,
+    letterSpacing: "0.06em",
+  },
+  filtersWrapper: {
+    maxWidth: 1280,
+    margin: "0 auto",
+    padding: "24px 24px 0",
+  },
+  filtersRow: {
+    display: "flex",
+    gap: 10,
+    flexWrap: "wrap",
+    listStyle: "none",
+    padding: 0,
+    margin: 0,
+  },
+  grid: {
+    maxWidth: 1280,
+    margin: "0 auto",
+    padding: "32px 24px 80px",
+    display: "grid",
+    gridTemplateColumns: "repeat(2, 1fr)",
+    gap: 20,
+  },
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    overflow: "hidden",
+    textDecoration: "none",
+    display: "block",
+    boxShadow: "0 2px 12px rgba(0,0,0,0.5)",
+    transition: "transform 0.2s, box-shadow 0.2s",
+    cursor: "pointer",
+  },
+  imageBox: {
+    aspectRatio: "4/5",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "clamp(40px, 8vw, 72px)",
+    position: "relative",
+  },
+  badgePill: {
+    position: "absolute",
+    top: 12,
+    right: 12,
+    backgroundColor: "#111",
+    color: "#fff",
+    fontSize: 11,
+    fontWeight: 700,
+    padding: "4px 10px",
+    borderRadius: 20,
+    letterSpacing: "0.05em",
+  },
+  cardBody: {
+    padding: "14px 16px 18px",
+    borderTop: "1px solid #f0f0f0",
+  },
+  cardTitle: {
+    fontSize: 14,
+    fontWeight: 600,
+    color: "#111",
+    margin: 0,
+    marginBottom: 8,
+    lineHeight: 1.4,
+  },
+  priceRow: {
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+    flexWrap: "wrap",
+  },
+  priceNew: {
+    fontSize: 15,
+    fontWeight: 700,
+    color: "#111",
+  },
+  priceOld: {
+    fontSize: 13,
+    color: "#aaa",
+    textDecoration: "line-through",
+    fontWeight: 400,
+  },
+  empty: {
+    gridColumn: "1 / -1",
+    textAlign: "center",
+    color: "#666",
+    padding: "80px 0",
+    fontSize: 16,
+  },
+};
+
+function filterTabStyle(active) {
+  return {
+    padding: "8px 20px",
+    borderRadius: 30,
+    border: "1px solid",
+    borderColor: active ? "#fff" : "#333",
+    background: active ? "#fff" : "transparent",
+    color: active ? "#111" : "#aaa",
+    fontSize: 13,
+    fontWeight: active ? 700 : 400,
+    cursor: "pointer",
+    transition: "all 0.2s",
+    letterSpacing: "0.03em",
+    fontFamily: "inherit",
+  };
+}
+
+function gridStyle(isMounted) {
+  if (!isMounted) return { ...styles.grid };
+  return {
+    ...styles.grid,
+    gridTemplateColumns:
+      typeof window !== "undefined" && window.innerWidth >= 768
+        ? "repeat(4, 1fr)"
+        : "repeat(2, 1fr)",
+  };
+}
+
+export default function ShopCollectionListPage() {
   const [activeCategory, setActiveCategory] = useState("all");
-  const t = useTranslations();
+  const [hovered, setHovered] = useState(null);
 
-  useEffect(() => {
-    fetch("/api/products")
-      .then((r) => r.json())
-      .then((data) => {
-        setProducts(Array.isArray(data) ? data : []);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, []);
-
-  const categories = [
-    { id: "all", label: t("common.viewAll") },
-    ...Array.from(
-      new Map(
-        products
-          .filter((p) => p.category)
-          .map((p) => [p.category, { id: p.category, label: p.categoryName || p.category }])
-      ).values()
-    ),
+  const allCategories = [
+    { id: "all", name: "הכל" },
+    ...DEMO_CATEGORIES.map((c) => ({ id: c.slug, name: c.name })),
   ];
 
   const filtered =
     activeCategory === "all"
-      ? products
-      : products.filter((p) => p.category === activeCategory);
+      ? DEMO_PRODUCTS
+      : DEMO_PRODUCTS.filter((p) => p.category === activeCategory);
 
   return (
-    <>
-      <div className="bg-surface">
-        <div id="wrapper">
-          <Topbar3 />
-          <Header1 parentClass="tf-header" />
+    <div style={styles.page}>
+      <Header1 parentClass="tf-header" />
 
-          <section className="flat-spacing-2 pb-0">
-            <div className="container">
-              <div className="page-title">
-                <div className="breadcrumbs">
-                  <ul className="bread-wrap">
-                    <li>
-                      <Link href="/" className="text-main-4 link-secondary">
-                        {t("nav.home")}
-                      </Link>
-                    </li>
-                    <li className="br-line w-12 bg-main" />
-                    <li><p>{t("nav.shop")}</p></li>
-                  </ul>
-                  <h1 className="heading fw-normal text-uppercase">
-                    {t("nav.shop")}
-                    <span className="number-count"> {filtered.length} </span>
-                  </h1>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {categories.length > 1 && (
-            <div className="flat-spacing-4 pb-0">
-              <div className="container">
-                <ul style={{ display: "flex", gap: 8, flexWrap: "wrap", listStyle: "none", padding: 0, margin: 0 }}>
-                  {categories.map((cat) => (
-                    <li key={cat.id}>
-                      <button
-                        onClick={() => setActiveCategory(cat.id)}
-                        style={{
-                          padding: "7px 18px",
-                          borderRadius: 30,
-                          border: "1px solid",
-                          borderColor: activeCategory === cat.id ? "#111" : "#ddd",
-                          background: activeCategory === cat.id ? "#111" : "transparent",
-                          color: activeCategory === cat.id ? "#fff" : "#555",
-                          fontSize: 13,
-                          fontWeight: activeCategory === cat.id ? 600 : 400,
-                          cursor: "pointer",
-                          transition: "all 0.2s",
-                        }}
-                      >
-                        {cat.label}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          )}
-
-          <section className="flat-spacing-6">
-            <div className="container">
-              {loading ? (
-                <p style={{ textAlign: "center", color: "#999", padding: "60px 0" }}>טוען מוצרים...</p>
-              ) : filtered.length === 0 ? (
-                <p style={{ textAlign: "center", color: "#999", padding: "60px 0" }}>אין מוצרים להצגה</p>
-              ) : (
-                <div className="tf-grid-layout sm-col-2 md-col-3 xl-col-4 gap-30">
-                  {filtered.map((product) => (
-                    <div key={product.id} className={`card_product--V01 ${product.outOfStock ? "out-of-stock" : ""}`}>
-                      <div className="card_product-wrapper">
-                        <Link href={`/product-default/${product.id}`} className="product-img">
-                          <Image
-                            src={product.imgSrc}
-                            alt={product.title}
-                            className="lazyload img-product"
-                            width={714}
-                            height={900}
-                            unoptimized
-                          />
-                          {product.hoverImgSrc && product.hoverImgSrc !== product.imgSrc && (
-                            <Image
-                              src={product.hoverImgSrc}
-                              alt={product.title}
-                              className="lazyload img-hover"
-                              width={714}
-                              height={900}
-                              unoptimized
-                            />
-                          )}
-                        </Link>
-
-                        {!product.outOfStock && (
-                          <ul className="list-product-btn">
-                            <li className="wishlist">
-                              <AddtoWishlist product={product} />
-                            </li>
-                            <li>
-                              <AddtoCart product={product} />
-                            </li>
-                            <li>
-                              <QuickView product={product} />
-                            </li>
-                          </ul>
-                        )}
-
-                        {product.badge && (
-                          <div className="badge-box">
-                            <span className="badge-item">{product.badge}</span>
-                          </div>
-                        )}
-
-                        {product.outOfStock && (
-                          <div className="badge-box">
-                            <span className="badge-item">{t("common.soldOut")}</span>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="card_product-info">
-                        <Link
-                          href={`/product-default/${product.id}`}
-                          className="name-product h5 fw-normal link text-line-clamp-2"
-                        >
-                          {product.title}
-                        </Link>
-                        <div className="price-wrap">
-                          <span className="price-new h5">
-                            ₪{product.price.toFixed(2)}
-                          </span>
-                          {product.oldPrice && (
-                            <span className="price-old fw-normal">
-                              ₪{product.oldPrice.toFixed(2)}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </section>
-
-          <Footer1 />
-        </div>
+      <div style={styles.hero}>
+        <h1 style={styles.heroTitle}>הקולקציה שלנו</h1>
+        <p style={styles.heroSubtitle}>
+          {filtered.length} פריטים{" "}
+          {activeCategory !== "all" &&
+            `· ${allCategories.find((c) => c.id === activeCategory)?.name}`}
+        </p>
       </div>
-    </>
+
+      <div style={styles.filtersWrapper}>
+        <ul style={styles.filtersRow}>
+          {allCategories.map((cat) => (
+            <li key={cat.id}>
+              <button
+                onClick={() => setActiveCategory(cat.id)}
+                style={filterTabStyle(activeCategory === cat.id)}
+              >
+                {cat.name}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div
+        style={{
+          ...styles.grid,
+          gridTemplateColumns: "repeat(2, 1fr)",
+        }}
+        className="shop-grid"
+      >
+        <style>{`
+          @media (min-width: 768px) {
+            .shop-grid {
+              grid-template-columns: repeat(4, 1fr) !important;
+            }
+          }
+        `}</style>
+
+        {filtered.length === 0 ? (
+          <p style={styles.empty}>אין מוצרים בקטגוריה זו</p>
+        ) : (
+          filtered.map((product) => (
+            <Link
+              key={product.id}
+              href={`/product-default/${product.id}`}
+              style={{
+                ...styles.card,
+                transform: hovered === product.id ? "translateY(-4px)" : "none",
+                boxShadow:
+                  hovered === product.id
+                    ? "0 8px 28px rgba(0,0,0,0.7)"
+                    : "0 2px 12px rgba(0,0,0,0.5)",
+              }}
+              onMouseEnter={() => setHovered(product.id)}
+              onMouseLeave={() => setHovered(null)}
+            >
+              <div
+                style={{
+                  ...styles.imageBox,
+                  background: product.gradient,
+                }}
+              >
+                <span>{product.emoji}</span>
+                {product.badge && (
+                  <span style={styles.badgePill}>{product.badge}</span>
+                )}
+              </div>
+              <div style={styles.cardBody}>
+                <p style={styles.cardTitle}>{product.title}</p>
+                <div style={styles.priceRow}>
+                  <span style={styles.priceNew}>
+                    ₪{Number(product.price).toLocaleString("he-IL")}
+                  </span>
+                  {product.oldPrice && (
+                    <span style={styles.priceOld}>
+                      ₪{Number(product.oldPrice).toLocaleString("he-IL")}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </Link>
+          ))
+        )}
+      </div>
+
+      <Footer1 />
+    </div>
   );
 }

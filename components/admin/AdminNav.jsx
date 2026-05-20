@@ -55,6 +55,17 @@ const NAV = [
     ],
   },
   {
+    id: "content",
+    label: "תוכן האתר",
+    icon: "✏️",
+    base: "/admin/content",
+    children: [
+      { href: "/admin/content/videos",  label: "סרטוני גלילה" },
+      { href: "/admin/content/faq",     label: "שאלות נפוצות" },
+      { href: "/admin/content/why-us",  label: "למה אנחנו" },
+    ],
+  },
+  {
     id: "branding",
     label: "מיתוג",
     icon: "🎨",

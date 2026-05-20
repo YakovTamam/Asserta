@@ -55,6 +55,12 @@ const NAV = [
     ],
   },
   {
+    id: "media",
+    label: "ספריית מדיה",
+    icon: "🖼️",
+    href: "/admin/media",
+  },
+  {
     id: "content",
     label: "תוכן האתר",
     icon: "✏️",

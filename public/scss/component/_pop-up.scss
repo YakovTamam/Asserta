@@ -1569,6 +1569,7 @@
     gap: 5px;
     @include flex(center, center);
     flex-direction: column;
+    color: var(--black);
   }
 
   .toolbar-icon {

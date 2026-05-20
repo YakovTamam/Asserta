@@ -253,7 +253,7 @@ export default function MobileMenu() {
                 { label: "החנות",         href: "/shop-collection-list" },
                 { label: "אודות Asserta",  href: "/about-us" },
                 { label: "צרו קשר",       href: "/contact-us" },
-                { label: "מדיניות פרטיות",href: "/privacy" },
+                { label: "מדיניות פרטיות",href: "/privacy-policy" },
               ].map((item, i) => (
                 <motion.div
                   key={item.href}

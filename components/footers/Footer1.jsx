@@ -5,9 +5,9 @@ import Image from "next/image";
 import axios from "axios";
 
 const POLICY_LINKS = [
-  { label: "החזרות והחלפות", href: "/return" },
-  { label: "מדיניות פרטיות",  href: "/privacy" },
-  { label: "תקנון ותנאי שימוש", href: "/terms" },
+  { label: "אודות",            href: "/about-us" },
+  { label: "צרו קשר",          href: "/contact-us" },
+  { label: "מדיניות פרטיות",  href: "/privacy-policy" },
 ];
 
 const PAYMENT_ICONS = [

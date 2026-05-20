@@ -1,393 +1,111 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import CurrencySelect from "../common/CurrencySelect";
-import LanguageSelect from "../common/LanguageSelect";
 import axios from "axios";
-import { useTranslations } from "next-intl";
+
+const POLICY_LINKS = [
+  { label: "החזרות והחלפות", href: "/return" },
+  { label: "מדיניות פרטיות",  href: "/privacy" },
+  { label: "תקנון ותנאי שימוש", href: "/terms" },
+];
+
+const PAYMENT_ICONS = [
+  { src: "/images/payment/am-ex.svg",    alt: "American Express", w: 48 },
+  { src: "/images/payment/master-2.svg", alt: "Mastercard",        w: 44 },
+  { src: "/images/payment/visa-2.svg",   alt: "Visa",              w: 52 },
+  { src: "/images/payment/gg-pay-2.svg", alt: "Google Pay",        w: 54 },
+  { src: "/images/payment/apple-pay.svg",alt: "Apple Pay",         w: 54 },
+];
+
 export default function Footer1() {
-  const t = useTranslations("footerMenu");
-  const menuItems = [t("newCollection"), t("allJewelry"), t("charms"), t("bracelets"), t("rings"), t("earrings"), t("gifts"), t("collections")];
-  const [success, setSuccess] = useState(true);
-  const [showMessage, setShowMessage] = useState(false);
-  const handleShowMessage = () => {
-    setShowMessage(true);
-    setTimeout(() => {
-      setShowMessage(false);
-    }, 2000);
-  };
-  const sendEmail = async (e) => {
-    e.preventDefault(); // Prevent default form submission behavior
-    const email = e.target.email.value;
+  const [email,       setEmail]       = useState("");
+  const [submitted,   setSubmitted]   = useState(false);
+  const [emailError,  setEmailError]  = useState(false);
 
+  async function handleSubscribe(e) {
+    e.preventDefault();
     try {
-      const response = await axios.post(
-        "https://express-brevomail.vercel.app/api/contacts",
-        {
-          email,
-        }
-      );
-
-      if ([200, 201].includes(response.status)) {
-        e.target.reset(); // Reset the form
-        setSuccess(true); // Set success state
-        handleShowMessage();
-      } else {
-        setSuccess(false); // Handle unexpected responses
-        handleShowMessage();
-      }
-    } catch (error) {
-      console.error("Error:", error.response?.data || "An error occurred");
-      setSuccess(false); // Set error state
-      handleShowMessage();
-      e.target.reset(); // Reset the form
+      await axios.post("https://express-brevomail.vercel.app/api/contacts", { email });
+      setSubmitted(true);
+      setEmail("");
+    } catch {
+      setEmailError(true);
+      setTimeout(() => setEmailError(false), 3000);
     }
-  };
-  useEffect(() => {
-    const headings = document.querySelectorAll(".footer-heading-mobile");
-
-    const toggleOpen = (event) => {
-      const parent = event.target.closest(".footer-col-block");
-      const content = parent.querySelector(".tf-collapse-content");
-
-      if (parent.classList.contains("open")) {
-        parent.classList.remove("open");
-        content.style.height = "0px";
-      } else {
-        parent.classList.add("open");
-        content.style.height = content.scrollHeight + 10 + "px";
-      }
-    };
-
-    headings.forEach((heading) => {
-      heading.addEventListener("click", toggleOpen);
-    });
-
-    // Clean up event listeners when the component unmounts
-    return () => {
-      headings.forEach((heading) => {
-        heading.removeEventListener("click", toggleOpen);
-      });
-    };
-  }, []); // Empty dependency array means this will run only once on mount
+  }
 
   return (
-    <footer className="tf-footer">
-      <div className="footer-top">
-        <div className="container">
-          <ul className="category-list justify-content-xl-center">
-            {menuItems.map((item, index) => (
-              <li key={index}>
-                <Link
-                  href="/shop-collection-list"
-                  className="tf-btn btn-line has-icon link"
-                >
-                  <span className="text h6 text-uppercase fw-normal">
-                    {item}
-                  </span>
-                  <i className="icon icon-arrow-top-right" />
-                </Link>
-              </li>
-            ))}
-          </ul>
+    <footer style={{ background:"#111", color:"#fff", direction:"rtl" }}>
+
+      {/* ── Newsletter ── */}
+      <div style={{ borderBottom:"1px solid rgba(255,255,255,0.1)", padding:"40px 20px" }}>
+        <div style={{ maxWidth:600, margin:"0 auto", textAlign:"center" }}>
+          <h3 style={{ fontSize:20, fontWeight:700, marginBottom:8 }}>הצטרפי לקהילת ASSERTA</h3>
+          <p style={{ fontSize:14, color:"rgba(255,255,255,0.55)", marginBottom:20 }}>
+            גישה מוקדמת למוצרים חדשים, מבצעים בלעדיים ועוד.
+          </p>
+          {submitted ? (
+            <p style={{ color:"#4ade80", fontSize:14, fontWeight:600 }}>✓ נרשמת בהצלחה!</p>
+          ) : (
+            <form onSubmit={handleSubscribe}
+              style={{ display:"flex", gap:0, maxWidth:440, margin:"0 auto", borderRadius:10, overflow:"hidden", border:"1px solid rgba(255,255,255,0.2)" }}>
+              <input
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                required
+                placeholder="Your_email@example.com"
+                style={{ flex:1, padding:"12px 16px", background:"transparent", border:"none", color:"#fff", fontSize:14, outline:"none", direction:"ltr" }}
+              />
+              <button type="submit"
+                style={{ padding:"12px 22px", background:"#fff", color:"#111", border:"none", fontWeight:700, fontSize:14, cursor:"pointer", flexShrink:0 }}>
+                →
+              </button>
+            </form>
+          )}
+          {emailError && <p style={{ color:"#f87171", fontSize:13, marginTop:8 }}>שגיאה — נסי שוב</p>}
         </div>
       </div>
-      <div className="footer-body p-xl-0">
-        <div className="container">
-          <div className="row-footer">
-            <div className="col-s1">
-              <div className="footer-inner-wrap flex-lg-nowrap align-items-end">
-                <div className="box-title">
-                  <h6>{t("joinTitle")}</h6>
-                  <p className="notice font-2">
-                    <span className="fst-italic">{t("joinSubtitle")}</span>
-                  </p>
-                </div>
-                <div className="box-email">
-                  <p className="text-body text-main-3">{t("joinDesc")}</p>
-                  <div
-                    className={`tfSubscribeMsg  footer-sub-element ${
-                      showMessage ? "active" : ""
-                    }`}
-                  >
-                    {success ? (
-                      <p style={{ color: "rgb(52, 168, 83)" }}>{t("subscribeSuccess")}</p>
-                    ) : (
-                      <p style={{ color: "red" }}>{t("subscribeError")}</p>
-                    )}
-                  </div>
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      sendEmail(e);
-                    }}
-                    className="form-email"
-                  >
-                    <fieldset>
-                      <input
-                        className="bg-transparent"
-                        type="email"
-                        name="email"
-                        placeholder="Your_email@example.com"
-                        required
-                      />
-                    </fieldset>
-                    <div className="box-btn">
-                      <button type="submit" className="btn-submit link">
-                        <i className="icon-arrow-right-2" />
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
-            <div className="col-s2">
-              <div className="footer-inner-wrap flex-sm-nowrap s2">
-                <div className="footer-col-block">
-                  <p className="footer-heading footer-heading-mobile font-2">{t("findUs")}</p>
-                  <div className="tf-collapse-content">
-                    <ul className="footer-menu-list mb-24">
-                      <li>
-                        <p className="text-main-4">{t("findLocation")}</p>
-                      </li>
-                      <li>
-                        <a
-                          href="https://www.google.com/maps?q=123+Yarran+st,Punchbowl,NSW+202196,Australia"
-                          target="_blank"
-                          className="text-main-4 link text-decoration-underline"
-                        >
-                          {t("seeStores")}
-                        </a>
-                      </li>
-                      <li>
-                        <a href="tel:6483441233" className="text-main-4 link">
-                          (64) 8344 1233
-                        </a>
-                      </li>
-                      <li>
-                        <a
-                          href="mailto:hello@vemus.com"
-                          className="text-main-4 link"
-                        >
-                          hello@vemus.com
-                        </a>
-                      </li>
-                    </ul>
-                    <ul className="tf-social-icon">
-                      <li>
-                        <a
-                          href="https://www.facebook.com/"
-                          target="_blank"
-                          className="social-facebook"
-                        >
-                          <span className="icon">
-                            <i className="icon-facebook" />
-                          </span>
-                        </a>
-                      </li>
-                      <li>
-                        <a
-                          href="https://www.instagram.com/"
-                          target="_blank"
-                          className="social-instagram"
-                        >
-                          <span className="icon">
-                            <i className="icon-instagram" />
-                          </span>
-                        </a>
-                      </li>
-                      <li>
-                        <a
-                          href="https://x.com/"
-                          target="_blank"
-                          className="social-x"
-                        >
-                          <span className="icon">
-                            <i className="icon-x" />
-                          </span>
-                        </a>
-                      </li>
-                      <li>
-                        <a
-                          href="https://www.snapchat.com/"
-                          target="_blank"
-                          className="social-snapchat"
-                        >
-                          <span className="icon">
-                            <i className="icon-snapchat" />
-                          </span>
-                        </a>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-                <div className="footer-col-block p-xl-0">
-                  <p className="footer-heading footer-heading-mobile font-2">{t("help")}</p>
-                  <div className="tf-collapse-content">
-                    <ul className="footer-menu-list">
-                      <li>
-                        <Link href={`/shipping`} className="text-main-4 link">{t("shipping")}</Link>
-                      </li>
-                      <li>
-                        <Link href={`/return`} className="text-main-4 link">{t("returns")}</Link>
-                      </li>
-                      <li>
-                        <Link href={`/privacy`} className="text-main-4 link">{t("privacyPolicy")}</Link>
-                      </li>
-                      <li>
-                        <Link href={`/wishlist`} className="text-main-4 link">{t("myWishlist")}</Link>
-                      </li>
-                      <li>
-                        <Link href={`/compare`} className="text-main-4 link">{t("compare")}</Link>
-                      </li>
-                      <li>
-                        <Link href={`/faq`} className="text-main-4 link">{t("faq")}</Link>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-                <div className="footer-col-block">
-                  <p className="footer-heading footer-heading-mobile font-2">{t("aboutUs")}</p>
-                  <div className="tf-collapse-content">
-                    <ul className="footer-menu-list">
-                      <li>
-                        <Link href={`/about-us`} className="text-main-4 link">{t("ourStory")}</Link>
-                      </li>
-                      <li>
-                        <Link href={`/our-store`} className="text-main-4 link">{t("visitStore")}</Link>
-                      </li>
-                      <li>
-                        <Link href={`/contact-us`} className="text-main-4 link">{t("contactUs")}</Link>
-                      </li>
-                      <li>
-                        <Link href={`/account-page`} className="text-main-4 link">{t("account")}</Link>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
+
+      {/* ── Links ── */}
+      <div style={{ borderBottom:"1px solid rgba(255,255,255,0.1)", padding:"28px 20px" }}>
+        <div style={{ maxWidth:900, margin:"0 auto", display:"flex", flexWrap:"wrap", justifyContent:"center", gap:"10px 32px" }}>
+          {POLICY_LINKS.map(l => (
+            <Link key={l.href} href={l.href}
+              style={{ color:"rgba(255,255,255,0.7)", fontSize:14, textDecoration:"none" }}>
+              {l.label}
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Payment icons ── */}
+      <div style={{ borderBottom:"1px solid rgba(255,255,255,0.1)", padding:"24px 20px" }}>
+        <div style={{ maxWidth:900, margin:"0 auto", display:"flex", flexWrap:"wrap", justifyContent:"center", alignItems:"center", gap:12 }}>
+          {/* Bit — inline badge */}
+          <div style={{
+            width:56, height:36, borderRadius:8, background:"#fff",
+            display:"flex", alignItems:"center", justifyContent:"center",
+            fontSize:13, fontWeight:900, color:"#00a8e8", letterSpacing:-0.5,
+          }}>
+            bit.
           </div>
-        </div>
-      </div>
-      <div className="footer-bottom">
-        <div className="container">
-          <div className="footer-bottom-wrap">
-            <div className="footer-bar-language">
-              <div className="tf-currencies">
-                <CurrencySelect />
-              </div>
-              <div className="tf-languages">
-                <LanguageSelect />
-              </div>
+          {PAYMENT_ICONS.map(p => (
+            <div key={p.alt} style={{ width:56, height:36, borderRadius:8, background:"#fff", display:"flex", alignItems:"center", justifyContent:"center", padding:"4px 6px" }}>
+              <Image src={p.src} alt={p.alt} width={p.w} height={22} style={{ objectFit:"contain" }} />
             </div>
-            <p className="text-nocopy">{t("copyright")}</p>
-            <ul className="paymend-method-list">
-              <li>
-                <a href="#">
-                  <Image
-                    alt="Paymend Method"
-                    width={40}
-                    height={25}
-                    src="/images/payment/am-ex.svg"
-                  />
-                </a>
-              </li>
-              <li>
-                <a href="#">
-                  <Image
-                    alt="Paymend Method"
-                    width={40}
-                    height={25}
-                    src="/images/payment/apple-pay.svg"
-                  />
-                </a>
-              </li>
-              <li>
-                <a href="#">
-                  <Image
-                    alt="Paymend Method"
-                    width={40}
-                    height={25}
-                    src="/images/payment/dinner.svg"
-                  />
-                </a>
-              </li>
-              <li>
-                <a href="#">
-                  <Image
-                    alt="Paymend Method"
-                    width={40}
-                    height={25}
-                    src="/images/payment/discover.svg"
-                  />
-                </a>
-              </li>
-              <li>
-                <a href="#">
-                  <Image
-                    alt="Paymend Method"
-                    width={38}
-                    height={24}
-                    src="/images/payment/gg-pay.svg"
-                  />
-                </a>
-              </li>
-              <li>
-                <a href="#">
-                  <Image
-                    alt="Paymend Method"
-                    width={40}
-                    height={25}
-                    src="/images/payment/master-2.svg"
-                  />
-                </a>
-              </li>
-              <li>
-                <a href="#">
-                  <Image
-                    alt="Paymend Method"
-                    width={40}
-                    height={25}
-                    src="/images/payment/master.svg"
-                  />
-                </a>
-              </li>
-              <li>
-                <a href="#">
-                  <Image
-                    alt="Paymend Method"
-                    width={40}
-                    height={25}
-                    src="/images/payment/shop-pay.svg"
-                  />
-                </a>
-              </li>
-              <li>
-                <a href="#">
-                  <Image
-                    alt="Paymend Method"
-                    width={40}
-                    height={25}
-                    src="/images/payment/unicon-pay.svg"
-                  />
-                </a>
-              </li>
-              <li>
-                <a href="#">
-                  <Image
-                    alt="Paymend Method"
-                    width={40}
-                    height={25}
-                    src="/images/payment/visa.svg"
-                  />
-                </a>
-              </li>
-            </ul>
-          </div>
+          ))}
         </div>
       </div>
+
+      {/* ── Copyright ── */}
+      <div style={{ padding:"20px", textAlign:"center" }}>
+        <p style={{ fontSize:13, color:"rgba(255,255,255,0.45)", margin:0 }}>
+          © {new Date().getFullYear()} Asserta.
+        </p>
+      </div>
+
     </footer>
   );
 }

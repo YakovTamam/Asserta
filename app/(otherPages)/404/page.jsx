@@ -1,40 +1,30 @@
 import Header1 from "@/components/headers/Header1";
-import Topbar1 from "@/components/headers/Topbar1";
-import React from "react";
+import Footer1 from "@/components/footers/Footer1";
 import Link from "next/link";
-import Image from "next/image";
+
 export const metadata = {
-  title: "Page Not Found || Vemus - Jewelry Ecommerce React Nextjs Template",
-  description: "Vemus - Jewelry Ecommerce React Nextjs Template",
+  title: "דף לא נמצא — Asserta",
 };
-export default function page() {
+
+export default function NotFoundPage() {
   return (
     <>
-      <Topbar1 />
-      <Header1 parentClass="tf-header line-bt-2" />
-      <div className="wg-404 tf-grid-layout sm-col-2 gap-0 vh-100">
-        <div className="image">
-          <Image
-            src="/images/section/404.jpg"
-            alt={404}
-            className="lazyload"
-            width={1920}
-            height={1868}
-          />
-        </div>
-        <div className="content">
-          <h1 className="heading">
-            <span className="text-primary">Opps! </span>Page not found!
-          </h1>
-          <p className="sub-head">
-            The page you are looking is not available or has been removed. Try
-            going to HomePage by using the button below.
-          </p>
-          <Link href={`/`} className="tf-btn btn-fill fw-medium animate-btn">
-            RETURN TO HOMEPAGE
+      <Header1 />
+      <main style={{ minHeight: "100vh", background: "#f9f9f9", direction: "rtl", display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 16px" }}>
+        <div style={{ textAlign: "center", maxWidth: 480 }}>
+          <div style={{ fontSize: 80, fontWeight: 900, color: "#111", letterSpacing: "-4px", marginBottom: 16 }}>404</div>
+          <h1 style={{ fontSize: 24, fontWeight: 800, color: "#111", marginBottom: 12 }}>הדף לא נמצא</h1>
+          <p style={{ color: "#888", fontSize: 15, marginBottom: 32 }}>הדף שחיפשת לא קיים או הוסר. חזרי לדף הבית להמשך קנייה.</p>
+          <Link href="/" style={{
+            display: "inline-block", padding: "14px 36px",
+            background: "#111", color: "#fff", borderRadius: 12,
+            fontWeight: 700, fontSize: 15, textDecoration: "none",
+          }}>
+            חזרה לדף הבית
           </Link>
         </div>
-      </div>
+      </main>
+      <Footer1 />
     </>
   );
 }

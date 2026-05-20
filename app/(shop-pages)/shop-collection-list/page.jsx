@@ -6,9 +6,6 @@ import Header1 from "@/components/headers/Header1";
 import Footer1 from "@/components/footers/Footer1";
 import { DEMO_PRODUCTS, DEMO_CATEGORIES } from "@/lib/demo-products";
 
-export const metadata = {
-  title: "החנות — Asserta",
-};
 
 const styles = {
   page: {

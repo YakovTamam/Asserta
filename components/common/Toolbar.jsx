@@ -10,6 +10,14 @@ export default function Toolbar() {
     <>
       <div className="tf-toolbar-bottom">
         <div className="toolbar-item">
+          <a href="#mobileMenu" data-bs-toggle="offcanvas">
+            <span className="toolbar-icon">
+              <i className="icon icon-menu-2" />
+            </span>
+            <span className="toolbar-label">תפריט</span>
+          </a>
+        </div>
+        <div className="toolbar-item">
           <a href="#shoppingCart" data-bs-toggle="offcanvas">
             <span className="toolbar-icon">
               <i className="icon icon-cart-2" />

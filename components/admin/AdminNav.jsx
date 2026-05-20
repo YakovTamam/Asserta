@@ -206,6 +206,9 @@ export default function AdminNav({ children }) {
           <p className={styles.logoSub}>ADMIN</p>
         </div>
         <SidebarNav pathname={pathname} />
+        <Link href="/" className={styles.viewSiteBtn} target="_blank" rel="noopener">
+          <span style={{ fontSize: 13 }}>🌐</span> צפה באתר
+        </Link>
         <button onClick={handleLogout} className={styles.logoutBtn}>יציאה</button>
       </aside>
 
@@ -215,7 +218,12 @@ export default function AdminNav({ children }) {
           <span /><span /><span />
         </button>
         <span className={styles.topBarTitle}>ASSERTA</span>
-        <button onClick={handleLogout} className={styles.topBarLogout}>יציאה</button>
+        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+          <Link href="/" target="_blank" rel="noopener" className={styles.topBarViewSite} title="צפה באתר">
+            🌐
+          </Link>
+          <button onClick={handleLogout} className={styles.topBarLogout}>יציאה</button>
+        </div>
       </div>
 
       {/* ── Overlay ── */}
@@ -231,6 +239,9 @@ export default function AdminNav({ children }) {
           <button onClick={() => setDrawerOpen(false)} className={styles.drawerClose}>×</button>
         </div>
         <DrawerNav pathname={pathname} onLinkClick={() => setDrawerOpen(false)} />
+        <Link href="/" className={styles.drawerViewSiteBtn} target="_blank" rel="noopener" onClick={() => setDrawerOpen(false)}>
+          🌐 צפה באתר
+        </Link>
         <button onClick={handleLogout} className={styles.drawerLogoutBtn}>יציאה מהמערכת</button>
       </div>
 

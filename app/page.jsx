@@ -4,6 +4,7 @@ import Stories from "@/components/homes/home-6/Stories";
 import VideoScrollSection from "@/components/homes/home-6/VideoScrollSection";
 import FeaturedProducts from "@/components/homes/home-6/FeaturedProducts";
 import WhyUs from "@/components/homes/home-6/WhyUs";
+import FAQ from "@/components/homes/home-6/FAQ";
 import RecentlyViewed from "@/components/homes/home-6/RecentlyViewed";
 import Footer1 from "@/components/footers/Footer1";
 
@@ -22,6 +23,7 @@ export default function Home() {
       <FeaturedProducts />
       <VideoScrollSection overlayText="עיצוב שנולד מאהבה" />
       <WhyUs />
+      <FAQ />
       <RecentlyViewed />
       <Footer1 />
     </>

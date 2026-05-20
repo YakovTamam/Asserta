@@ -174,6 +174,8 @@ export default function AdminNav({ children }) {
   const router = useRouter();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
+  if (pathname === "/admin/login") return <>{children}</>;
+
   useEffect(() => {
     document.body.style.overflow = drawerOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };

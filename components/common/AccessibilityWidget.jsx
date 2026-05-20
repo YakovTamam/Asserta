@@ -73,7 +73,7 @@ export default function AccessibilityWidget() {
         title={t("button")}
         style={{
           position: "fixed",
-          bottom: 20,
+          bottom: 140,
           left: 16,
           zIndex: 9997,
           width: 46,
@@ -103,7 +103,7 @@ export default function AccessibilityWidget() {
         <div
           style={{
             position: "fixed",
-            bottom: 126,
+            bottom: 246,
             insetInlineStart: 16,
             zIndex: 9997,
             background: "#fff",

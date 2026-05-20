@@ -240,6 +240,7 @@ export default function Stories({ isSticky = true }) {
   const sectionRef  = useRef(null);
   const timerRef    = useRef(null);
   const touchStartX = useRef(null);
+  const touchStartY = useRef(null);
 
   const story = activeIdx !== null ? DEMO[activeIdx] : null;
   const media = story ? story.media[mediaIdx] : null;
@@ -308,15 +309,24 @@ export default function Stories({ isSticky = true }) {
 
   function handleTap(e) {
     const { left, width } = e.currentTarget.getBoundingClientRect();
-    advance((e.clientX - left) < width * 0.35 ? -1 : 1);
+    advance((e.clientX - left) < width * 0.35 ? 1 : -1);
   }
 
-  function handleTouchStart(e) { touchStartX.current = e.touches[0].clientX; }
+  function handleTouchStart(e) {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  }
   function handleTouchEnd(e) {
     if (!touchStartX.current) return;
-    const diff = touchStartX.current - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 55) advance(diff > 0 ? 1 : -1);
+    const diffX = touchStartX.current - e.changedTouches[0].clientX;
+    const diffY = touchStartY.current - e.changedTouches[0].clientY;
+    if (diffY < -80 && Math.abs(diffY) > Math.abs(diffX)) {
+      closeStory();
+    } else if (Math.abs(diffX) > 55) {
+      advance(diffX > 0 ? -1 : 1);
+    }
     touchStartX.current = null;
+    touchStartY.current = null;
   }
 
   const showSticky = isSticky && isStuck;

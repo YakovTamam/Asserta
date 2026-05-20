@@ -72,6 +72,7 @@ export default function ProductsPage() {
   const [view,       setView]       = useState("list");
   const [step,       setStep]       = useState(0);
   const [saving,     setSaving]     = useState(false);
+  const [saveError,  setSaveError]  = useState("");
   const [uploading,  setUploading]  = useState(false);
   const [search,     setSearch]     = useState("");
   const fileRef = useRef(null);
@@ -93,11 +94,18 @@ export default function ProductsPage() {
     setCategories(cats || []);
   }
 
+  function makeSlug(title_he, title_en) {
+    const fromEn = (title_en || "").trim().toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, "");
+    if (fromEn) return fromEn;
+    return "product-" + Date.now();
+  }
+
   function handleChange(e) {
     const { name, value, type, checked } = e.target;
     setForm((p) => ({
       ...p, [name]: type === "checkbox" ? checked : value,
-      ...(name === "title_he" && !editId ? { slug: value.trim().toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, "") } : {}),
+      ...(name === "title_he" && !editId ? { slug: makeSlug(value, p.title_en) } : {}),
+      ...(name === "title_en" && !editId ? { slug: makeSlug(p.title_he, value) } : {}),
     }));
   }
 
@@ -141,11 +149,21 @@ export default function ProductsPage() {
   async function handleSave() {
     if (!form.title_he || !form.price || form.category_ids.length === 0) return;
     setSaving(true);
-    const payload = { ...form, price: parseFloat(form.price), old_price: form.old_price ? parseFloat(form.old_price) : null, category_id: form.category_ids[0] || null };
-    if (editId) {
-      await supabase.from("products").update(payload).eq("id", editId);
-    } else {
-      await supabase.from("products").insert(payload);
+    setSaveError("");
+    const slug = form.slug || makeSlug(form.title_he, form.title_en);
+    const payload = {
+      ...form, slug,
+      price: parseFloat(form.price),
+      old_price: form.old_price ? parseFloat(form.old_price) : null,
+      category_id: form.category_ids[0] || null,
+    };
+    const { error } = editId
+      ? await supabase.from("products").update(payload).eq("id", editId)
+      : await supabase.from("products").insert(payload);
+    if (error) {
+      setSaveError(error.message || "שגיאה בשמירה");
+      setSaving(false);
+      return;
     }
     setForm(emptyForm); setEditId(null); setStep(0); setView("list");
     await fetchAll(); setSaving(false);
@@ -383,6 +401,11 @@ export default function ProductsPage() {
           {form.category_ids.length === 0 && (
             <div style={{ padding: "12px 16px", background: "#fef9c3", border: "1px solid #fde68a", borderRadius: 10, fontSize: 13, color: "#92400e", marginBottom: 10, textAlign: "center" }}>
               יש לבחור קטגוריה אחת לפחות לפני השמירה
+            </div>
+          )}
+          {saveError && (
+            <div style={{ padding: "12px 16px", background: "#fee2e2", border: "1px solid #fca5a5", borderRadius: 10, fontSize: 13, color: "#991b1b", marginBottom: 10, textAlign: "center" }}>
+              ❌ {saveError}
             </div>
           )}
           <div style={{ display: "flex", gap: 10, position: "sticky", bottom: 16 }}>

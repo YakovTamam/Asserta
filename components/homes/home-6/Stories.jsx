@@ -415,7 +415,12 @@ export default function Stories({ isSticky = true }) {
 
             <div onClick={handleTap} style={{ position:"absolute", top:80, left:0, right:0, bottom:160, zIndex:5, cursor:"pointer" }} />
 
-            <div style={{ position:"absolute", bottom:20, left:16, right:16, zIndex:10 }}>
+            <div
+              style={{ position:"absolute", bottom:20, left:16, right:16, zIndex:10 }}
+              onTouchStart={(e) => e.stopPropagation()}
+              onTouchEnd={(e) => e.stopPropagation()}
+              onTouchMove={(e) => e.stopPropagation()}
+            >
               <ProductCard key={media.id} products={media.products} />
             </div>
           </div>

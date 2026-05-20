@@ -1,7 +1,10 @@
 import Header1 from "@/components/headers/Header1";
 import Hero from "@/components/homes/home-6/Hero";
 import Stories from "@/components/homes/home-6/Stories";
-import Collections from "@/components/homes/home-6/Collections";
+import VideoScrollSection from "@/components/homes/home-6/VideoScrollSection";
+import FeaturedProducts from "@/components/homes/home-6/FeaturedProducts";
+import WhyUs from "@/components/homes/home-6/WhyUs";
+import RecentlyViewed from "@/components/homes/home-6/RecentlyViewed";
 import Footer1 from "@/components/footers/Footer1";
 
 export const metadata = {
@@ -15,7 +18,11 @@ export default function Home() {
       <Header1 />
       <Hero />
       <Stories isSticky={true} />
-      <Collections />
+      <VideoScrollSection overlayText="כל תכשיט מספר סיפור" />
+      <FeaturedProducts />
+      <VideoScrollSection overlayText="עיצוב שנולד מאהבה" />
+      <WhyUs />
+      <RecentlyViewed />
       <Footer1 />
     </>
   );

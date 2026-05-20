@@ -61,10 +61,12 @@ export default function CategoriesPage() {
     e.preventDefault();
     setLoading(true);
     if (editId) {
-      await supabase.from("categories").update(form).eq("id", editId);
+      const { error } = await supabase.from("categories").update(form).eq("id", editId);
+      if (error) { alert("שגיאה: " + error.message); setLoading(false); return; }
       setEditId(null);
     } else {
-      await supabase.from("categories").insert(form);
+      const { error } = await supabase.from("categories").insert(form);
+      if (error) { alert("שגיאה: " + error.message); setLoading(false); return; }
     }
     setForm(emptyForm);
     setShowForm(false);

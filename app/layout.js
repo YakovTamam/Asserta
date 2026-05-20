@@ -26,15 +26,23 @@ import AccessibilityWidget from "@/components/common/AccessibilityWidget";
 import CookieBanner from "@/components/common/CookieBanner";
 import SiteOnlyComponents from "@/components/common/SiteOnlyComponents";
 import MarketingScripts from "@/components/common/MarketingScripts";
+import { supabaseAdmin } from "@/lib/supabase-server";
 
 export default async function RootLayout({ children }) {
   const locale = await getLocale();
   const messages = await getMessages();
   const isRTL = locale === "he";
 
+  let faviconUrl = "/favicon.ico";
+  try {
+    const { data } = await supabaseAdmin.from("settings").select("value").eq("key","favicon_url").single();
+    if (data?.value) faviconUrl = data.value;
+  } catch {}
+
   return (
     <html lang={locale} dir={isRTL ? "rtl" : "ltr"}>
       <head>
+        <link rel="icon" href={faviconUrl} />
         <link
           rel="stylesheet"
           href={isRTL ? "/css/bootstrap.rtl.min.css" : "/css/bootstrap.min.css"}

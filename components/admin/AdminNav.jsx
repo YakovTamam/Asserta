@@ -55,6 +55,12 @@ const NAV = [
     ],
   },
   {
+    id: "branding",
+    label: "מיתוג",
+    icon: "🎨",
+    href: "/admin/branding",
+  },
+  {
     id: "docs",
     label: "מדריך למשתמש",
     icon: "📖",

@@ -10,12 +10,15 @@ export default function Toolbar() {
     <>
       <div className="tf-toolbar-bottom">
         <div className="toolbar-item">
-          <a href="#mobileMenu" data-bs-toggle="offcanvas">
+          <button
+            onClick={() => window.__openMobileMenu?.()}
+            style={{ background:"none", border:"none", cursor:"pointer", padding:0, width:"100%", display:"flex", flexDirection:"column", alignItems:"center", gap:4 }}
+          >
             <span className="toolbar-icon">
               <i className="icon icon-sidebar" />
             </span>
             <span className="toolbar-label">תפריט</span>
-          </a>
+          </button>
         </div>
         <div className="toolbar-item">
           <a href="#shoppingCart" data-bs-toggle="offcanvas">

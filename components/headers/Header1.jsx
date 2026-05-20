@@ -23,7 +23,6 @@ export default async function Header1({ parentClass = "tf-header line-bt-2" }) {
           <div className="col-md-4 col-3 d-xl-none">
             <a
               href="#mobileMenu"
-              data-bs-toggle="offcanvas"
               className="btn-mobile-menu"
             >
               <span />

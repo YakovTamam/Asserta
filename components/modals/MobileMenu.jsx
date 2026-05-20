@@ -62,7 +62,7 @@ export default function MobileMenu() {
   useEffect(() => {
     const handler = (e) => {
       const trigger = e.target.closest('[href="#mobileMenu"], [data-bs-target="#mobileMenu"]');
-      if (trigger) { e.preventDefault(); e.stopPropagation(); open(); }
+      if (trigger) { e.preventDefault(); e.stopImmediatePropagation(); open(); }
     };
     document.addEventListener("click", handler, true);
     window.__openMobileMenu  = open;

@@ -19,9 +19,9 @@ export default function Home() {
       <Header1 />
       <Hero />
       <Stories isSticky={true} />
-      <VideoScrollSection overlayText="כל תכשיט מספר סיפור" />
+      <VideoScrollSection position={1} />
       <FeaturedProducts />
-      <VideoScrollSection overlayText="עיצוב שנולד מאהבה" />
+      <VideoScrollSection position={2} />
       <WhyUs />
       <FAQ />
       <RecentlyViewed />

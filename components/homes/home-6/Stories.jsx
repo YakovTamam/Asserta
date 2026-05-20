@@ -272,7 +272,7 @@ export default function Stories({ isSticky = true }) {
       {/* ── Sticky top bar ─────────────────────────────────── */}
       {isSticky && (isStuck || viewed.size > 0) && !stickyDismissed && (
         <div style={{
-          position:"fixed", top:0, left:0, right:0, zIndex:1000,
+          position:"fixed", top:0, left:0, right:0, zIndex:500,
           background:"rgba(9,11,17,0.97)", backdropFilter:"blur(16px)",
           borderBottom:"1px solid rgba(255,255,255,0.07)",
           display:"flex", alignItems:"center", gap:14, padding:"9px 16px",
@@ -340,7 +340,7 @@ export default function Stories({ isSticky = true }) {
       {/* ── Story viewer modal ─────────────────────────────── */}
       {activeIdx !== null && story && media && (
         <div
-          style={{ position:"fixed", inset:0, zIndex:900, background:"rgba(0,0,0,0.94)", display:"flex", alignItems:"center", justifyContent:"center" }}
+          style={{ position:"fixed", inset:0, zIndex:1046, background:"rgba(0,0,0,0.94)", display:"flex", alignItems:"center", justifyContent:"center" }}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >

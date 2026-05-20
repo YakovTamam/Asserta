@@ -115,28 +115,24 @@ export default function MobileMenu() {
   return (
     <div
       className="offcanvas offcanvas-start"
+      tabIndex="-1"
       id="mobileMenu"
       style={{
-        background: "transparent",
-        border: "none",
-        width: "min(360px, 92vw)",
-      }}
-    >
-      <style>{KF}</style>
-
-      {/* ── Glass panel ── */}
-      <div style={{
-        position: "absolute", inset: 0,
         background: "linear-gradient(160deg, rgba(18,18,20,0.97) 0%, rgba(10,10,12,0.99) 100%)",
         backdropFilter: "blur(32px) saturate(180%)",
         WebkitBackdropFilter: "blur(32px) saturate(180%)",
         boxShadow: "4px 0 60px rgba(0,0,0,0.8), inset 1px 0 0 rgba(255,255,255,0.06)",
+        border: "none",
+        width: "min(360px, 92vw)",
         overflowY: "auto",
         overflowX: "hidden",
         scrollbarWidth: "none",
         display: "flex",
         flexDirection: "column",
-      }}>
+      }}
+    >
+      <style>{KF}</style>
+      <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
 
         {/* ── Header ── */}
         <div style={{

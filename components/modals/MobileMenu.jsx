@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
@@ -41,46 +41,44 @@ const SOCIAL = [
   },
 ];
 
-const STATIC_CATEGORIES = [
-  { label: "טבעות",    slug: "rings" },
-  { label: "שרשראות",  slug: "necklaces" },
-  { label: "עגילים",   slug: "earrings" },
-  { label: "טניס",     slug: "tennis" },
-  { label: "גברים",    slug: "men" },
-  { label: "חדש",      slug: "new" },
-];
-
 const KF = `
   @keyframes luxShimmer {
     0%   { background-position: -200% center; }
     100% { background-position:  200% center; }
   }
-  @keyframes floatUp {
-    0%,100% { transform: translateY(0px); }
-    50%     { transform: translateY(-4px); }
-  }
 `;
 
 export default function MobileMenu() {
+  const [isOpen,      setIsOpen]      = useState(false);
   const [products,    setProducts]    = useState([]);
-  const [categories,  setCategories]  = useState(STATIC_CATEGORIES);
+  const [categories,  setCategories]  = useState([]);
   const [viewed,      setViewed]      = useState([]);
   const [activeSlug,  setActiveSlug]  = useState(null);
-  const [isOpen,      setIsOpen]      = useState(false);
 
-  /* Detect offcanvas open/close */
+  const open  = () => setIsOpen(true);
+  const close = () => setIsOpen(false);
+
+  /* Intercept all Bootstrap triggers pointing at #mobileMenu */
   useEffect(() => {
-    const el = document.getElementById("mobileMenu");
-    if (!el) return;
-    const onShow = () => setIsOpen(true);
-    const onHide = () => setIsOpen(false);
-    el.addEventListener("show.bs.offcanvas",   onShow);
-    el.addEventListener("hidden.bs.offcanvas", onHide);
+    const handler = (e) => {
+      const trigger = e.target.closest('[href="#mobileMenu"], [data-bs-target="#mobileMenu"]');
+      if (trigger) { e.preventDefault(); e.stopPropagation(); open(); }
+    };
+    document.addEventListener("click", handler, true);
+    window.__openMobileMenu  = open;
+    window.__closeMobileMenu = close;
     return () => {
-      el.removeEventListener("show.bs.offcanvas",   onShow);
-      el.removeEventListener("hidden.bs.offcanvas", onHide);
+      document.removeEventListener("click", handler, true);
+      delete window.__openMobileMenu;
+      delete window.__closeMobileMenu;
     };
   }, []);
+
+  /* Lock body scroll when open */
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [isOpen]);
 
   /* Fetch products + categories */
   useEffect(() => {
@@ -89,11 +87,8 @@ export default function MobileMenu() {
       fetch("/api/categories").then(r => r.json()).catch(() => []),
     ]).then(([prods, cats]) => {
       setProducts(Array.isArray(prods) ? prods.slice(0, 12) : []);
-      if (Array.isArray(cats) && cats.length > 0) {
-        setCategories(cats.map(c => ({ label: c.name_he || c.name_en, slug: c.slug })));
-      }
+      setCategories(Array.isArray(cats)  ? cats.map(c => ({ label: c.name_he || c.name_en, slug: c.slug })) : []);
     });
-    /* Load viewed products from localStorage */
     try {
       const v = JSON.parse(localStorage.getItem("viewed_products") || "[]");
       setViewed(v);
@@ -113,262 +108,258 @@ export default function MobileMenu() {
     : viewed.length > 0 ? "Inspired By Your Taste" : "Best Sellers";
 
   return (
-    <div
-      className="offcanvas offcanvas-start"
-      tabIndex="-1"
-      id="mobileMenu"
-      style={{
-        background: "linear-gradient(160deg, rgba(18,18,20,0.97) 0%, rgba(10,10,12,0.99) 100%)",
-        backdropFilter: "blur(32px) saturate(180%)",
-        WebkitBackdropFilter: "blur(32px) saturate(180%)",
-        boxShadow: "4px 0 60px rgba(0,0,0,0.8), inset 1px 0 0 rgba(255,255,255,0.06)",
-        border: "none",
-        width: "min(360px, 92vw)",
-        overflowY: "auto",
-        overflowX: "hidden",
-        scrollbarWidth: "none",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
+    <>
       <style>{KF}</style>
-      <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
 
-        {/* ── Header ── */}
-        <div style={{
-          display: "flex", alignItems: "center", justifyContent: "space-between",
-          padding: "24px 20px 20px",
-          borderBottom: "1px solid rgba(255,255,255,0.06)",
-          flexShrink: 0,
-        }}>
-          <div style={{
-            fontSize: 18, fontWeight: 800, letterSpacing: 6,
-            background: "linear-gradient(90deg, #fff 0%, rgba(255,255,255,0.6) 50%, #fff 100%)",
-            backgroundSize: "200% auto",
-            WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-            animation: "luxShimmer 4s linear infinite",
-          }}>
-            ASSERTA
-          </div>
-          <button
-            data-bs-dismiss="offcanvas"
+      {/* Backdrop */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            key="backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            onClick={close}
             style={{
-              width: 36, height: 36, borderRadius: "50%",
-              background: "rgba(255,255,255,0.07)",
-              border: "1px solid rgba(255,255,255,0.1)",
-              color: "rgba(255,255,255,0.7)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              cursor: "pointer", fontSize: 18, transition: "all 0.2s",
+              position: "fixed", inset: 0, zIndex: 3000,
+              background: "rgba(0,0,0,0.6)",
+              backdropFilter: "blur(2px)",
+            }}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Panel */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            key="panel"
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "tween", duration: 0.35, ease: [0.23, 1, 0.32, 1] }}
+            style={{
+              position: "fixed",
+              top: 0, right: 0, bottom: 0,
+              width: "min(360px, 92vw)",
+              zIndex: 3001,
+              background: "linear-gradient(160deg, rgba(18,18,20,0.98) 0%, rgba(10,10,12,0.99) 100%)",
+              backdropFilter: "blur(32px) saturate(180%)",
+              WebkitBackdropFilter: "blur(32px) saturate(180%)",
+              boxShadow: "-4px 0 60px rgba(0,0,0,0.8), inset -1px 0 0 rgba(255,255,255,0.06)",
+              display: "flex",
+              flexDirection: "column",
+              overflowY: "auto",
+              overflowX: "hidden",
+              scrollbarWidth: "none",
             }}
           >
-            ×
-          </button>
-        </div>
 
-        {/* ── Category pills ── */}
-        <div style={{ padding: "20px 0 0", flexShrink: 0 }}>
-          <p style={{
-            fontSize: 9, fontWeight: 700, letterSpacing: 3,
-            color: "rgba(255,255,255,0.3)", textTransform: "uppercase",
-            padding: "0 20px", marginBottom: 14,
-          }}>
-            Collections
-          </p>
-          <div style={{
-            display: "flex", gap: 8, overflowX: "auto",
-            padding: "4px 20px 16px", scrollbarWidth: "none",
-          }}>
-            <PillBtn
-              label="הכל"
-              active={activeSlug === null}
-              onClick={() => setActiveSlug(null)}
-            />
-            {categories.map(cat => (
-              <PillBtn
-                key={cat.slug}
-                label={cat.label}
-                active={activeSlug === cat.slug}
-                onClick={() => setActiveSlug(activeSlug === cat.slug ? null : cat.slug)}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* ── Products section ── */}
-        <div style={{ flexShrink: 0 }}>
-          <p style={{
-            fontSize: 9, fontWeight: 700, letterSpacing: 3,
-            color: "rgba(255,255,255,0.3)", textTransform: "uppercase",
-            padding: "0 20px", marginBottom: 14,
-          }}>
-            {sectionTitle}
-          </p>
-
-          {filtered.length === 0 ? (
-            <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, padding: "0 20px 20px" }}>
-              אין מוצרים
-            </p>
-          ) : (
+            {/* ── Header ── */}
             <div style={{
-              display: "flex", gap: 14, overflowX: "auto",
-              padding: "4px 20px 24px", scrollbarWidth: "none",
+              display: "flex", alignItems: "center", justifyContent: "space-between",
+              padding: "24px 20px 20px",
+              borderBottom: "1px solid rgba(255,255,255,0.06)",
+              flexShrink: 0,
             }}>
-              {filtered.map((p, i) => (
-                <LuxProductCard key={p.id} product={p} index={i} />
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* ── Divider ── */}
-        <div style={{
-          margin: "0 20px",
-          height: 1,
-          background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent)",
-          flexShrink: 0,
-        }} />
-
-        {/* ── Nav links ── */}
-        <nav style={{ padding: "20px 20px", flexShrink: 0 }}>
-          {[
-            { label: "החנות",        href: "/shop-collection-list" },
-            { label: "אודות Asserta", href: "/about-us" },
-            { label: "צרו קשר",      href: "/contact-us" },
-            { label: "מדיניות פרטיות",href: "/privacy" },
-          ].map((item, i) => (
-            <motion.div
-              key={item.href}
-              initial={{ opacity: 0, x: -16 }}
-              animate={isOpen ? { opacity: 1, x: 0 } : { opacity: 0, x: -16 }}
-              transition={{ delay: 0.1 + i * 0.06, duration: 0.4, ease: "easeOut" }}
-            >
-              <Link
-                href={item.href}
-                data-bs-dismiss="offcanvas"
+              <div style={{
+                fontSize: 18, fontWeight: 800, letterSpacing: 6,
+                background: "linear-gradient(90deg, #fff 0%, rgba(255,255,255,0.6) 50%, #fff 100%)",
+                backgroundSize: "200% auto",
+                WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+                animation: "luxShimmer 4s linear infinite",
+              }}>
+                ASSERTA
+              </div>
+              <button
+                onClick={close}
                 style={{
-                  display: "flex", alignItems: "center", justifyContent: "space-between",
-                  padding: "12px 0",
-                  borderBottom: "1px solid rgba(255,255,255,0.05)",
-                  color: "rgba(255,255,255,0.75)", textDecoration: "none",
-                  fontSize: 14, fontWeight: 500, letterSpacing: 0.3,
-                  transition: "color 0.2s",
+                  width: 36, height: 36, borderRadius: "50%",
+                  background: "rgba(255,255,255,0.07)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  color: "rgba(255,255,255,0.7)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  cursor: "pointer", fontSize: 20, lineHeight: 1,
                 }}
               >
-                {item.label}
-                <span style={{ color: "rgba(255,255,255,0.2)", fontSize: 12 }}>›</span>
-              </Link>
-            </motion.div>
-          ))}
-        </nav>
+                ×
+              </button>
+            </div>
 
-        {/* ── Spacer ── */}
-        <div style={{ flex: 1 }} />
+            {/* ── Category pills ── */}
+            {categories.length > 0 && (
+              <div style={{ padding: "20px 0 0", flexShrink: 0 }}>
+                <p style={{
+                  fontSize: 9, fontWeight: 700, letterSpacing: 3,
+                  color: "rgba(255,255,255,0.3)", textTransform: "uppercase",
+                  padding: "0 20px", marginBottom: 12,
+                }}>
+                  Collections
+                </p>
+                <div style={{
+                  display: "flex", gap: 8, overflowX: "auto",
+                  padding: "4px 20px 16px", scrollbarWidth: "none",
+                }}>
+                  <PillBtn label="הכל" active={activeSlug === null} onClick={() => setActiveSlug(null)} />
+                  {categories.map(cat => (
+                    <PillBtn
+                      key={cat.slug}
+                      label={cat.label}
+                      active={activeSlug === cat.slug}
+                      onClick={() => setActiveSlug(activeSlug === cat.slug ? null : cat.slug)}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
 
-        {/* ── Social icons ── */}
-        <div style={{
-          padding: "20px",
-          borderTop: "1px solid rgba(255,255,255,0.06)",
-          flexShrink: 0,
-        }}>
-          <p style={{
-            fontSize: 9, fontWeight: 700, letterSpacing: 3,
-            color: "rgba(255,255,255,0.25)", textTransform: "uppercase",
-            marginBottom: 14,
-          }}>
-            Follow Us
-          </p>
-          <div style={{ display: "flex", gap: 12 }}>
-            {SOCIAL.map(s => (
-              <SocialBtn key={s.label} {...s} />
-            ))}
-          </div>
-        </div>
+            {/* ── Products ── */}
+            {products.length > 0 && (
+              <div style={{ flexShrink: 0 }}>
+                <p style={{
+                  fontSize: 9, fontWeight: 700, letterSpacing: 3,
+                  color: "rgba(255,255,255,0.3)", textTransform: "uppercase",
+                  padding: "0 20px", marginBottom: 12,
+                }}>
+                  {sectionTitle}
+                </p>
+                {filtered.length === 0 ? (
+                  <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, padding: "0 20px 20px" }}>אין מוצרים</p>
+                ) : (
+                  <div style={{
+                    display: "flex", gap: 14, overflowX: "auto",
+                    padding: "4px 20px 24px", scrollbarWidth: "none",
+                  }}>
+                    {filtered.map((p, i) => (
+                      <LuxProductCard key={p.id} product={p} index={i} onClose={close} />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
-      </div>
-    </div>
+            {/* ── Divider ── */}
+            <div style={{
+              margin: "0 20px",
+              height: 1,
+              background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent)",
+              flexShrink: 0,
+            }} />
+
+            {/* ── Nav links ── */}
+            <nav style={{ padding: "20px", flexShrink: 0 }}>
+              {[
+                { label: "החנות",         href: "/shop-collection-list" },
+                { label: "אודות Asserta",  href: "/about-us" },
+                { label: "צרו קשר",       href: "/contact-us" },
+                { label: "מדיניות פרטיות",href: "/privacy" },
+              ].map((item, i) => (
+                <motion.div
+                  key={item.href}
+                  initial={{ opacity: 0, x: 16 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1 + i * 0.06, duration: 0.35 }}
+                >
+                  <Link
+                    href={item.href}
+                    onClick={close}
+                    style={{
+                      display: "flex", alignItems: "center", justifyContent: "space-between",
+                      padding: "12px 0",
+                      borderBottom: "1px solid rgba(255,255,255,0.05)",
+                      color: "rgba(255,255,255,0.75)", textDecoration: "none",
+                      fontSize: 15, fontWeight: 500, letterSpacing: 0.3,
+                    }}
+                  >
+                    {item.label}
+                    <span style={{ color: "rgba(255,255,255,0.25)", fontSize: 14 }}>‹</span>
+                  </Link>
+                </motion.div>
+              ))}
+            </nav>
+
+            {/* ── Spacer ── */}
+            <div style={{ flex: 1, minHeight: 20 }} />
+
+            {/* ── Social icons ── */}
+            <div style={{
+              padding: "20px",
+              borderTop: "1px solid rgba(255,255,255,0.06)",
+              flexShrink: 0,
+            }}>
+              <p style={{
+                fontSize: 9, fontWeight: 700, letterSpacing: 3,
+                color: "rgba(255,255,255,0.25)", textTransform: "uppercase",
+                marginBottom: 14,
+              }}>
+                Follow Us
+              </p>
+              <div style={{ display: "flex", gap: 12 }}>
+                {SOCIAL.map(s => (
+                  <SocialBtn key={s.label} {...s} />
+                ))}
+              </div>
+            </div>
+
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Keep an empty div with the Bootstrap offcanvas id so existing triggers don't 404 */}
+      <div id="mobileMenu" style={{ display: "none" }} />
+    </>
   );
 }
 
-/* ── Pill button ── */
+/* ── Pill ── */
 function PillBtn({ label, active, onClick }) {
   return (
     <button onClick={onClick} style={{
-      padding: "8px 16px",
-      borderRadius: 100,
+      padding: "8px 16px", borderRadius: 100, flexShrink: 0,
       border: `1px solid ${active ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.12)"}`,
-      background: active
-        ? "rgba(255,255,255,0.12)"
-        : "rgba(255,255,255,0.04)",
-      backdropFilter: "blur(8px)",
+      background: active ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.04)",
       color: active ? "#fff" : "rgba(255,255,255,0.55)",
       fontSize: 12, fontWeight: active ? 700 : 400,
       cursor: "pointer", whiteSpace: "nowrap",
-      boxShadow: active ? "0 0 12px rgba(255,255,255,0.08)" : "none",
-      transition: "all 0.25s ease",
-      flexShrink: 0,
+      transition: "all 0.2s ease",
     }}>
       {label}
     </button>
   );
 }
 
-/* ── Luxury product card ── */
-function LuxProductCard({ product, index }) {
-  const [hovered, setHovered] = useState(false);
-
+/* ── Product card ── */
+function LuxProductCard({ product, index, onClose }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.05, duration: 0.4, ease: "easeOut" }}
+      transition={{ delay: index * 0.04, duration: 0.35 }}
       style={{ flexShrink: 0, width: 130 }}
     >
-      <Link
-        href={`/product-default/${product.id}`}
-        data-bs-dismiss="offcanvas"
-        style={{ textDecoration: "none", display: "block" }}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-      >
-        {/* Image */}
+      <Link href={`/product-default/${product.id}`} onClick={onClose} style={{ textDecoration: "none", display: "block" }}>
         <div style={{
-          width: 130, height: 160,
-          borderRadius: 14,
-          overflow: "hidden",
+          width: 130, height: 160, borderRadius: 14, overflow: "hidden",
           background: "rgba(255,255,255,0.04)",
           border: "1px solid rgba(255,255,255,0.08)",
           position: "relative",
-          boxShadow: hovered
-            ? "0 20px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.12)"
-            : "0 8px 24px rgba(0,0,0,0.4)",
-          transform: hovered ? "translateY(-4px) scale(1.02)" : "translateY(0) scale(1)",
-          transition: "all 0.35s cubic-bezier(0.23,1,0.32,1)",
+          boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
         }}>
           {product.imgSrc ? (
-            <Image
-              src={product.imgSrc}
-              alt={product.title}
-              fill
-              style={{ objectFit: "cover", transition: "transform 0.5s ease" }}
-              unoptimized
-            />
+            <Image src={product.imgSrc} alt={product.title} fill style={{ objectFit: "cover" }} unoptimized />
           ) : (
             <div style={{
               width: "100%", height: "100%",
               background: "linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 32,
+              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32,
             }}>💍</div>
           )}
-
-          {/* Reflection overlay */}
           <div style={{
             position: "absolute", inset: 0,
-            background: "linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%)",
+            background: "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 50%)",
             pointerEvents: "none",
           }} />
-
-          {/* Badge */}
           {product.badge && (
             <div style={{
               position: "absolute", top: 8, right: 8,
@@ -376,14 +367,11 @@ function LuxProductCard({ product, index }) {
               border: "1px solid rgba(255,255,255,0.15)",
               color: "#fff", fontSize: 9, fontWeight: 700,
               padding: "3px 8px", borderRadius: 100,
-              letterSpacing: 0.5,
             }}>
               {product.badge}
             </div>
           )}
         </div>
-
-        {/* Info */}
         <div style={{ padding: "10px 2px 0" }}>
           <p style={{
             color: "rgba(255,255,255,0.8)", fontSize: 12, fontWeight: 500,
@@ -393,10 +381,7 @@ function LuxProductCard({ product, index }) {
           }}>
             {product.title}
           </p>
-          <p style={{
-            color: "rgba(255,255,255,0.5)", fontSize: 11, fontWeight: 600,
-            letterSpacing: 0.3,
-          }}>
+          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, fontWeight: 600 }}>
             ₪{Number(product.price).toLocaleString("he-IL")}
           </p>
         </div>
@@ -407,26 +392,15 @@ function LuxProductCard({ product, index }) {
 
 /* ── Social button ── */
 function SocialBtn({ label, href, icon }) {
-  const [hovered, setHovered] = useState(false);
   return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      title={label}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        width: 40, height: 40, borderRadius: "50%",
-        border: `1px solid ${hovered ? "rgba(255,255,255,0.35)" : "rgba(255,255,255,0.12)"}`,
-        background: hovered ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.04)",
-        color: hovered ? "#fff" : "rgba(255,255,255,0.5)",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        textDecoration: "none",
-        boxShadow: hovered ? "0 0 16px rgba(255,255,255,0.1)" : "none",
-        transition: "all 0.25s ease",
-      }}
-    >
+    <a href={href} target="_blank" rel="noopener noreferrer" title={label} style={{
+      width: 40, height: 40, borderRadius: "50%",
+      border: "1px solid rgba(255,255,255,0.12)",
+      background: "rgba(255,255,255,0.04)",
+      color: "rgba(255,255,255,0.5)",
+      display: "flex", alignItems: "center", justifyContent: "center",
+      textDecoration: "none",
+    }}>
       {icon}
     </a>
   );

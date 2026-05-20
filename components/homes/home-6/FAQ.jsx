@@ -1,7 +1,7 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-const ITEMS = [
+const FALLBACK_ITEMS = [
   {
     q: "אילו אמצעי תשלום אתם מקבלים?",
     a: "אנו מקבלים את כל אמצעי התשלום הנפוצים: כרטיסי אשראי (ויזה, מאסטרקארד, אמריקן אקספרס), Bit, Apple Pay ו-Google Pay. כל העסקאות מאובטחות בתקן הגבוה ביותר.",
@@ -38,6 +38,18 @@ const ITEMS = [
 
 export default function FAQ() {
   const [open, setOpen] = useState(null);
+  const [items, setItems] = useState(FALLBACK_ITEMS);
+
+  useEffect(() => {
+    fetch("/api/content/faq")
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          setItems(data.map(item => ({ q: item.question, a: item.answer })));
+        }
+      })
+      .catch(() => {/* keep fallback */});
+  }, []);
 
   return (
     <section style={{ background: "#0d0d0d", padding: "80px 20px", direction: "rtl" }}>
@@ -55,12 +67,12 @@ export default function FAQ() {
 
         {/* Items */}
         <div style={{ border: "1px solid rgba(255,255,255,0.08)", borderRadius: 20, overflow: "hidden" }}>
-          {ITEMS.map((item, i) => {
+          {items.map((item, i) => {
             const isOpen = open === i;
             return (
               <div
                 key={i}
-                style={{ borderBottom: i < ITEMS.length - 1 ? "1px solid rgba(255,255,255,0.08)" : "none" }}
+                style={{ borderBottom: i < items.length - 1 ? "1px solid rgba(255,255,255,0.08)" : "none" }}
               >
                 <button
                   onClick={() => setOpen(isOpen ? null : i)}

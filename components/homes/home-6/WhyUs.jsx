@@ -1,6 +1,7 @@
 "use client";
+import { useState, useEffect } from "react";
 
-const ITEMS = [
+const FALLBACK_ITEMS = [
   {
     icon: "✦",
     title: "עיצוב ייחודי",
@@ -24,6 +25,19 @@ const ITEMS = [
 ];
 
 export default function WhyUs() {
+  const [items, setItems] = useState(FALLBACK_ITEMS);
+
+  useEffect(() => {
+    fetch("/api/content/why-us")
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          setItems(data.map(item => ({ icon: item.icon, title: item.title, text: item.body })));
+        }
+      })
+      .catch(() => {/* keep fallback */});
+  }, []);
+
   return (
     <section
       style={{
@@ -67,7 +81,7 @@ export default function WhyUs() {
             gap: 20,
           }}
         >
-          {ITEMS.map((item) => (
+          {items.map((item) => (
             <div
               key={item.title}
               style={{

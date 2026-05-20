@@ -61,8 +61,17 @@ export default function VideoScrollSection({ position = 1 }) {
   const sectionRef = useRef(null);
   const videoRef   = useRef(null);
   const [progress, setProgress] = useState(0);
+  const [sections, setSections] = useState(null); // null = loading
 
-  const data     = DEMO.find(d => d.position === position) || DEMO[0];
+  useEffect(() => {
+    fetch("/api/content/videos")
+      .then(res => res.json())
+      .then(data => { if (Array.isArray(data)) setSections(data); else setSections([]); })
+      .catch(() => setSections([]));
+  }, []);
+
+  const dbSection = sections ? sections.find(s => s.position === position) : undefined;
+  const data      = dbSection !== undefined ? dbSection : (DEMO.find(d => d.position === position) || DEMO[0]);
   const src      = data.video_url;
   const overlays = data.overlays || [];
   const buttons  = data.buttons  || [];
@@ -86,6 +95,20 @@ export default function VideoScrollSection({ position = 1 }) {
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, [position]);
+
+  // Still loading from API — show gradient placeholder
+  if (sections === null) {
+    return (
+      <section style={{ position: "relative", height: "300vh" }}>
+        <div style={{ position: "sticky", top: 0, height: "100vh", overflow: "hidden" }}>
+          <div style={{ width: "100%", height: "100%",
+            background: position === 1
+              ? "linear-gradient(135deg,#0a0a0a 0%,#1a1a2e 50%,#0d0d1a 100%)"
+              : "linear-gradient(135deg,#0d0d0d 0%,#1a0a00 50%,#2d1200 100%)" }} />
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section ref={sectionRef} style={{ position: "relative", height: "300vh" }}>

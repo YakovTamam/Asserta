@@ -198,6 +198,9 @@ export default function AdminNav({ children }) {
           <p className={styles.logoSub}>ADMIN</p>
         </div>
         <SidebarNav pathname={pathname} />
+        <Link href="/" className={styles.viewSiteBtn} target="_blank" rel="noopener">
+          <span style={{ fontSize: 13 }}>🌐</span> צפה באתר
+        </Link>
         <button onClick={handleLogout} className={styles.logoutBtn}>יציאה</button>
       </aside>
 
@@ -223,6 +226,9 @@ export default function AdminNav({ children }) {
           <button onClick={() => setDrawerOpen(false)} className={styles.drawerClose}>×</button>
         </div>
         <DrawerNav pathname={pathname} onLinkClick={() => setDrawerOpen(false)} />
+        <Link href="/" className={styles.drawerViewSiteBtn} target="_blank" rel="noopener" onClick={() => setDrawerOpen(false)}>
+          🌐 צפה באתר
+        </Link>
         <button onClick={handleLogout} className={styles.drawerLogoutBtn}>יציאה מהמערכת</button>
       </div>
 

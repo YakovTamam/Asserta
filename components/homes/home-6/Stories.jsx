@@ -237,12 +237,17 @@ export default function Stories({ isSticky = true }) {
   const [isStuck,     setIsStuck]     = useState(false);
   const [progressKey, setProgressKey] = useState(0);
 
+  const sortedDemo = [
+    ...DEMO.filter(s => !viewed.has(s.id)),
+    ...DEMO.filter(s =>  viewed.has(s.id)),
+  ];
+
   const sectionRef  = useRef(null);
   const timerRef    = useRef(null);
   const touchStartX = useRef(null);
   const touchStartY = useRef(null);
 
-  const story = activeIdx !== null ? DEMO[activeIdx] : null;
+  const story = activeIdx !== null ? sortedDemo[activeIdx] : null;
   const media = story ? story.media[mediaIdx] : null;
 
   /* auto-advance */
@@ -300,7 +305,7 @@ export default function Stories({ isSticky = true }) {
       setProgressKey(k => k + 1);
     } else if (dir > 0) {
       setViewed(prev => new Set([...prev, story.id]));
-      if (activeIdx + 1 < DEMO.length) openStory(activeIdx + 1, 0);
+      if (activeIdx + 1 < sortedDemo.length) openStory(activeIdx + 1, 0);
       else closeStory();
     } else {
       if (activeIdx - 1 >= 0) openStory(activeIdx - 1, DEMO[activeIdx - 1].media.length - 1);
@@ -346,7 +351,7 @@ export default function Stories({ isSticky = true }) {
           direction:"rtl",
         }}>
           <div style={{ display:"flex", gap:8, overflowX:"auto", scrollbarWidth:"none", paddingBottom:2 }}>
-            {DEMO.map((s, i) => (
+            {sortedDemo.map((s, i) => (
               <StoryCard key={s.id} s={s} i={i} isViewed={viewed.has(s.id)} onClick={openStory} small />
             ))}
           </div>
@@ -361,7 +366,7 @@ export default function Stories({ isSticky = true }) {
             <span style={{ width:6, height:6, borderRadius:"50%", background:"linear-gradient(135deg,#a855f7,#ec4899)", display:"inline-block" }} />
           </div>
           <div style={{ display:"flex", gap:10, overflowX:"auto", paddingBottom:4, scrollbarWidth:"none" }}>
-            {DEMO.map((s, i) => (
+            {sortedDemo.map((s, i) => (
               <StoryCard key={s.id} s={s} i={i} isViewed={viewed.has(s.id)} onClick={openStory} />
             ))}
           </div>

@@ -210,7 +210,12 @@ export default function AdminNav({ children }) {
           <span /><span /><span />
         </button>
         <span className={styles.topBarTitle}>ASSERTA</span>
-        <button onClick={handleLogout} className={styles.topBarLogout}>יציאה</button>
+        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+          <Link href="/" target="_blank" rel="noopener" className={styles.topBarViewSite} title="צפה באתר">
+            🌐
+          </Link>
+          <button onClick={handleLogout} className={styles.topBarLogout}>יציאה</button>
+        </div>
       </div>
 
       {/* ── Overlay ── */}

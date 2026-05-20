@@ -151,7 +151,7 @@ export default function ProductsPage() {
     setSaving(true);
     setSaveError("");
     const slug = form.slug || makeSlug(form.title_he, form.title_en);
-    const { category_ids, ...rest } = form;
+    const { category_ids, specs, ...rest } = form;
     const payload = {
       ...rest, slug,
       price: parseFloat(form.price),

@@ -151,11 +151,12 @@ export default function ProductsPage() {
     setSaving(true);
     setSaveError("");
     const slug = form.slug || makeSlug(form.title_he, form.title_en);
+    const { category_ids, ...rest } = form;
     const payload = {
-      ...form, slug,
+      ...rest, slug,
       price: parseFloat(form.price),
       old_price: form.old_price ? parseFloat(form.old_price) : null,
-      category_id: form.category_ids[0] || null,
+      category_id: category_ids[0] || null,
     };
     const { error } = editId
       ? await supabase.from("products").update(payload).eq("id", editId)

@@ -35,21 +35,21 @@ const TYPE_WEIGHT = { h1: 800, h2: 700, p: 400, caption: 500 };
 const DEMO = [
   {
     position: 1,
-    video_url: null,
+    video_url: "https://videos.pexels.com/video-files/5793048/5793048-hd_1280_720_25fps.mp4",
     overlays: [
-      { id:"o1", text:"כל תכשיט מספר סיפור", type:"h1", pos_x:"center", pos_y:"middle", color:"#ffffff", anim_in:"slideUp",   scroll_show:0.05, scroll_hide:0.85 },
-      { id:"o2", text:"קולקציית 2025",         type:"caption", pos_x:"center", pos_y:"middle", color:"rgba(255,255,255,0.55)", anim_in:"fadeIn", scroll_show:0.15, scroll_hide:0.85 },
+      { id:"o1", text:"כל תכשיט מספר סיפור", type:"h1", pos_x:"center", pos_y:"middle", color:"#ffffff", fontSize:64, fontWeight:800, anim_in:"slideUp",   scroll_show:0.05, scroll_hide:0.82, dir:"rtl" },
+      { id:"o2", text:"קולקציית 2025 — תכשיטים בעבודת יד",  type:"p",  pos_x:"center", pos_y:"middle", color:"rgba(255,255,255,0.75)", fontSize:18, anim_in:"fadeIn", scroll_show:0.14, scroll_hide:0.82, dir:"rtl" },
     ],
     buttons: [
-      { id:"b1", text:"לקולקציה", href:"/shop-collection-list", style:"outline", pos_x:"center", pos_y:"bottom", scroll_show:0.2, scroll_hide:0.85 },
+      { id:"b1", text:"לקולקציה", href:"/shop-collection-list", style:"outline", pos_x:"center", pos_y:"bottom", scroll_show:0.22, scroll_hide:0.85 },
     ],
   },
   {
     position: 2,
-    video_url: null,
+    video_url: "https://videos.pexels.com/video-files/4763830/4763830-hd_1280_720_60fps.mp4",
     overlays: [
-      { id:"o3", text:"עיצוב שנולד מאהבה", type:"h1", pos_x:"right", pos_y:"middle", color:"#ffffff", anim_in:"slideRight", scroll_show:0.05, scroll_hide:0.85 },
-      { id:"o4", text:"תכשיטים בעבודת יד · מ-₪650", type:"p", pos_x:"right", pos_y:"middle", color:"rgba(255,255,255,0.7)", anim_in:"slideRight", scroll_show:0.18, scroll_hide:0.85 },
+      { id:"o3", text:"עיצוב שנולד מאהבה", type:"h1", pos_x:"right", pos_y:"middle", color:"#ffffff", fontSize:56, fontWeight:800, anim_in:"slideRight", scroll_show:0.05, scroll_hide:0.82, dir:"rtl" },
+      { id:"o4", text:"תכשיטים בעבודת יד · החל מ-₪650", type:"p", pos_x:"right", pos_y:"middle", color:"rgba(255,255,255,0.72)", fontSize:18, anim_in:"slideRight", scroll_show:0.18, scroll_hide:0.82, dir:"rtl" },
     ],
     buttons: [
       { id:"b2", text:"גלי עכשיו", href:"/shop-collection-list", style:"primary", pos_x:"right", pos_y:"bottom", scroll_show:0.25, scroll_hide:0.85 },
@@ -137,10 +137,11 @@ export default function VideoScrollSection({ position = 1 }) {
           const visible  = progress >= showFrom && progress <= hideAt;
           const ps = posStyle(ov.pos_x, ov.pos_y);
           const fontSize = ov.fontSize ? `${ov.fontSize}px` : (TYPE_SIZE[ov.type] || TYPE_SIZE.p);
+          const dir = ov.dir || "rtl";
           return (
             <div key={ov.id || ov.text} style={{
               position:"absolute", inset:0, zIndex:2, display:"flex",
-              flexDirection:"column", direction:"rtl",
+              flexDirection:"column", direction: dir,
               pointerEvents:"none",
               ...ps,
               opacity: visible ? 1 : 0,

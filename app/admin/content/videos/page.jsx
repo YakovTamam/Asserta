@@ -45,6 +45,7 @@ const defaultOverlay = () => ({
   pos_x: "center", pos_y: "middle",
   color: "#ffffff", fontSize: 40, fontWeight: 700,
   anim_in: "fadeIn", scroll_show: 0.05, scroll_hide: 0.85,
+  dir: "rtl",
 });
 
 const defaultButton = () => ({
@@ -170,6 +171,20 @@ function OverlayEditor({ overlay, onChange, onDelete }) {
           <div style={{ flex: 1, minWidth: 140 }}>
             <label style={C.label}>גודל פונט: {overlay.fontSize || 40}px</label>
             <input type="range" min={12} max={96} value={overlay.fontSize || 40} onChange={e => onChange({ ...overlay, fontSize: Number(e.target.value) })} style={{ width: "100%", marginTop: 8 }} />
+          </div>
+        </div>
+        <div>
+          <label style={C.label}>כיוון טקסט</label>
+          <div style={{ display: "flex", gap: 6 }}>
+            {[{ val: "rtl", label: "עברית →" }, { val: "ltr", label: "← English" }, { val: "auto", label: "אוטו" }].map(opt => {
+              const active = (overlay.dir || "rtl") === opt.val;
+              return (
+                <button key={opt.val} type="button" onClick={() => onChange({ ...overlay, dir: opt.val })}
+                  style={{ flex: 1, padding: "9px 4px", border: `1.5px solid ${active ? "#0f172a" : "#e2e8f0"}`, borderRadius: 8, background: active ? "#0f172a" : "#fff", color: active ? "#fff" : "#64748b", fontSize: 12, fontWeight: active ? 700 : 400, cursor: "pointer" }}>
+                  {opt.label}
+                </button>
+              );
+            })}
           </div>
         </div>
         <div>

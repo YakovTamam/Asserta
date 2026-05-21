@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import { createClient } from "@/lib/supabase-browser";
 
 const C = {
   primary: "#0f172a",
@@ -49,12 +48,11 @@ export default function FAQPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [flash, setFlash] = useState("");
-  const supabase = createClient();
 
   useEffect(() => { fetchItems(); }, []);
 
   async function fetchItems() {
-    const { data } = await supabase.from("faq_items").select("*").order("position");
+    const data = await fetch("/api/admin/content/faq").then(r => r.json());
     setItems(data || []);
   }
 
@@ -72,17 +70,12 @@ export default function FAQPage() {
     setError("");
 
     if (editId) {
-      const { error: err } = await supabase
-        .from("faq_items")
-        .update({ question: form.question, answer: form.answer })
-        .eq("id", editId);
-      if (err) { setError(err.message); setSaving(false); return; }
+      const res = await fetch("/api/admin/content/faq", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: editId, question: form.question, answer: form.answer }) });
+      if (!res.ok) { const d = await res.json().catch(() => ({})); setError(d.error || "שגיאה בשמירה"); setSaving(false); return; }
     } else {
       const maxPos = items.length > 0 ? Math.max(...items.map(i => i.position || 0)) : 0;
-      const { error: err } = await supabase
-        .from("faq_items")
-        .insert({ question: form.question, answer: form.answer, position: maxPos + 1, is_active: true });
-      if (err) { setError(err.message); setSaving(false); return; }
+      const res = await fetch("/api/admin/content/faq", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question: form.question, answer: form.answer, position: maxPos + 1, is_active: true }) });
+      if (!res.ok) { const d = await res.json().catch(() => ({})); setError(d.error || "שגיאה בשמירה"); setSaving(false); return; }
     }
 
     setForm(emptyForm);
@@ -94,24 +87,21 @@ export default function FAQPage() {
   }
 
   async function toggleActive(item) {
-    const { error: err } = await supabase
-      .from("faq_items")
-      .update({ is_active: !item.is_active })
-      .eq("id", item.id);
-    if (err) { setError(err.message); return; }
+    const res = await fetch("/api/admin/content/faq", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: item.id, is_active: !item.is_active }) });
+    if (!res.ok) { const d = await res.json().catch(() => ({})); setError(d.error || "שגיאה"); return; }
     setItems(prev => prev.map(i => i.id === item.id ? { ...i, is_active: !i.is_active } : i));
   }
 
   async function handleDelete(id) {
     if (!confirm("האם למחוק את השאלה?")) return;
-    const { error: err } = await supabase.from("faq_items").delete().eq("id", id);
-    if (err) { setError(err.message); return; }
+    const res = await fetch("/api/admin/content/faq", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) });
+    if (!res.ok) { const d = await res.json().catch(() => ({})); setError(d.error || "שגיאה במחיקה"); return; }
     await fetchItems();
     showFlash("נמחק ✓");
   }
 
   function openEdit(item) {
-    setEditId(item.id);
+    setEditId(item._id || item.id);
     setForm({ question: item.question || "", answer: item.answer || "" });
     setShowForm(true);
     setError("");
@@ -132,11 +122,11 @@ export default function FAQPage() {
     const posA = newItems[index].position;
     const posB = newItems[swapIndex].position;
 
-    const [{ error: e1 }, { error: e2 }] = await Promise.all([
-      supabase.from("faq_items").update({ position: posB }).eq("id", newItems[index].id),
-      supabase.from("faq_items").update({ position: posA }).eq("id", newItems[swapIndex].id),
+    const [r1, r2] = await Promise.all([
+      fetch("/api/admin/content/faq", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: newItems[index].id, position: posB }) }),
+      fetch("/api/admin/content/faq", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: newItems[swapIndex].id, position: posA }) }),
     ]);
-    if (e1 || e2) { setError("שגיאה בסידור מחדש"); return; }
+    if (!r1.ok || !r2.ok) { setError("שגיאה בסידור מחדש"); return; }
 
     newItems[index] = { ...newItems[index], position: posB };
     newItems[swapIndex] = { ...newItems[swapIndex], position: posA };
@@ -232,7 +222,7 @@ export default function FAQPage() {
           </div>
         ) : (
           items.map((item, idx) => (
-            <div key={item.id} style={{ ...C.cardStyle }}>
+            <div key={item._id || item.id} style={{ ...C.cardStyle }}>
               <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
 
                 {/* Drag handle (visual only) */}
@@ -277,7 +267,7 @@ export default function FAQPage() {
 
                   {/* Delete */}
                   <button
-                    onClick={() => handleDelete(item.id)}
+                    onClick={() => handleDelete(item._id || item.id)}
                     style={{ padding: "6px 10px", background: "#fee2e2", border: "none", borderRadius: 8, fontSize: 13, cursor: "pointer", color: C.danger }}
                   >
                     🗑

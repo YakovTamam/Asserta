@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { createClient } from "@/lib/supabase-browser";
 
 /* Upload directly to Cloudinary — bypasses Vercel's 4.5MB serverless limit */
 async function uploadDirect(file) {
@@ -254,11 +253,14 @@ function ButtonEditor({ btn, onChange, onDelete }) {
 function MediaPicker({ onSelect, onClose }) {
   const [videos, setVideos]   = useState([]);
   const [loading, setLoading] = useState(true);
-  const supabase = createClient();
 
   useEffect(() => {
-    supabase.from("media_files").select("*").eq("type", "video").order("created_at", { ascending: false })
-      .then(({ data }) => { setVideos(data || []); setLoading(false); });
+    fetch("/api/admin/media")
+      .then(r => r.json())
+      .then(data => {
+        setVideos((data || []).filter(f => f.type === "video"));
+        setLoading(false);
+      });
   }, []);
 
   return (
@@ -495,12 +497,11 @@ export default function VideosPage() {
   const [savingId, setSavingId] = useState(null);
   const [flashId,  setFlashId]  = useState(null);
   const [errors,   setErrors]   = useState({});
-  const supabase = createClient();
 
   useEffect(() => { fetchSections(); }, []);
 
   async function fetchSections() {
-    const { data } = await supabase.from("video_sections").select("*").order("position");
+    const data = await fetch("/api/admin/content/videos").then(r => r.json());
     if (!data || data.length === 0) {
       setSections([
         { ...defaultSection(1), _tempId: "tmp-1" },
@@ -535,12 +536,13 @@ export default function VideosPage() {
     };
 
     if (section.id) {
-      const { error } = await supabase.from("video_sections").update(payload).eq("id", section.id);
-      if (error) { setErrors(prev => ({ ...prev, [key]: error.message })); setSavingId(null); return; }
+      const res = await fetch("/api/admin/content/videos", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: section.id, ...payload }) });
+      if (!res.ok) { const d = await res.json().catch(() => ({})); setErrors(prev => ({ ...prev, [key]: d.error || "שגיאה בשמירה" })); setSavingId(null); return; }
     } else {
-      const { data, error } = await supabase.from("video_sections").insert(payload).select().single();
-      if (error) { setErrors(prev => ({ ...prev, [key]: error.message })); setSavingId(null); return; }
-      setSections(prev => prev.map(s => s._tempId === section._tempId ? { ...s, id: data.id, _isNew: false, _tempId: undefined } : s));
+      const res = await fetch("/api/admin/content/videos", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+      if (!res.ok) { const d = await res.json().catch(() => ({})); setErrors(prev => ({ ...prev, [key]: d.error || "שגיאה בשמירה" })); setSavingId(null); return; }
+      const saved = await res.json();
+      setSections(prev => prev.map(s => s._tempId === section._tempId ? { ...s, id: saved._id || saved.id, _isNew: false, _tempId: undefined } : s));
     }
 
     setSavingId(null);
@@ -550,7 +552,7 @@ export default function VideosPage() {
 
   async function deleteSection(section) {
     if (!confirm("האם למחוק את הסרטון?")) return;
-    if (section.id) await supabase.from("video_sections").delete().eq("id", section.id);
+    if (section.id) await fetch("/api/admin/content/videos", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: section.id }) });
     setSections(prev => prev.filter(s => s !== section));
   }
 

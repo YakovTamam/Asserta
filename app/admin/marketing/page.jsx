@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import { createClient } from "@/lib/supabase-browser";
 
 const C = {
   primary: "#0f172a",
@@ -53,22 +52,20 @@ export default function MarketingPage() {
   const [values,  setValues]  = useState({});
   const [saving,  setSaving]  = useState(false);
   const [saved,   setSaved]   = useState(false);
-  const supabase = createClient();
 
   useEffect(() => {
-    (async () => {
-      const { data } = await supabase.from("settings").select("key, value");
-      const map = Object.fromEntries((data || []).map(({ key, value }) => [key, value]));
-      setValues(map);
-    })();
+    const keys = FIELDS.map(f => f.key).join(",");
+    fetch(`/api/admin/settings?keys=${keys}`)
+      .then(r => r.json())
+      .then(data => setValues(data || {}));
   }, []);
 
   async function handleSave() {
     setSaving(true);
-    const rows = Object.entries(values)
-      .filter(([, v]) => v !== undefined)
-      .map(([key, value]) => ({ key, value: value || "" }));
-    await supabase.from("settings").upsert(rows, { onConflict: "key" });
+    const body = Object.fromEntries(
+      Object.entries(values).filter(([, v]) => v !== undefined).map(([k, v]) => [k, v || ""])
+    );
+    await fetch("/api/admin/settings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
@@ -115,17 +112,6 @@ export default function MarketingPage() {
         {saving ? "שומר..." : saved ? "✓ נשמר בהצלחה!" : "שמור הגדרות"}
       </button>
 
-      <div style={{ marginTop: 16, padding: "14px 16px", background: "#f8fafc", borderRadius: 12, border: "1px solid #e2e8f0" }}>
-        <p style={{ fontSize: 12, color: "#64748b", margin: 0, lineHeight: 1.7 }}>
-          <strong>SQL נדרש ב-Supabase:</strong><br />
-          <code style={{ fontFamily: "monospace", background: "#f1f5f9", padding: "2px 6px", borderRadius: 4 }}>
-            CREATE TABLE settings (key text PRIMARY KEY, value text, updated_at timestamptz DEFAULT now());
-          </code><br />
-          <code style={{ fontFamily: "monospace", background: "#f1f5f9", padding: "2px 6px", borderRadius: 4 }}>
-            ALTER TABLE settings DISABLE ROW LEVEL SECURITY;
-          </code>
-        </p>
-      </div>
     </div>
   );
 }

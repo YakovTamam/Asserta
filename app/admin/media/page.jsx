@@ -2,11 +2,21 @@
 import { useState, useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase-browser";
 
-/* Upload a file directly to Cloudinary, then save URL via server (bypasses Vercel 4.5MB + RLS) */
-async function uploadDirect(file) {
+/* Images → /api/upload (simple, works). Videos → direct to Cloudinary (bypasses Vercel 4.5MB) */
+async function uploadFile(file) {
   const isVideo = file.type.startsWith("video/");
 
-  // 1. Get signed params from server
+  if (!isVideo) {
+    // Images go through the server route — simple and reliable
+    const fd = new FormData();
+    fd.append("file", file);
+    const res  = await fetch("/api/upload", { method: "POST", body: fd });
+    const data = await res.json();
+    if (!data.url) throw new Error("העלאה נכשלה");
+    return { url: data.url, type: "image" };
+  }
+
+  // Videos: upload directly to Cloudinary from browser (no Vercel size limit)
   const signRes = await fetch("/api/cloudinary-sign", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -15,7 +25,6 @@ async function uploadDirect(file) {
   if (!signRes.ok) throw new Error("חתימה נכשלה");
   const { signature, timestamp, api_key, cloud_name, folder } = await signRes.json();
 
-  // 2. Upload directly to Cloudinary from browser
   const fd = new FormData();
   fd.append("file", file);
   fd.append("signature", signature);
@@ -24,24 +33,20 @@ async function uploadDirect(file) {
   fd.append("folder", folder);
 
   const uploadRes = await fetch(
-    `https://api.cloudinary.com/v1_1/${cloud_name}/${isVideo ? "video" : "image"}/upload`,
+    `https://api.cloudinary.com/v1_1/${cloud_name}/video/upload`,
     { method: "POST", body: fd }
   );
   const data = await uploadRes.json();
-  if (!data.secure_url) throw new Error(data.error?.message || "Cloudinary: העלאה נכשלה");
+  if (!data.secure_url) throw new Error(data.error?.message || "העלאת וידאו נכשלה");
 
-  // 3. Save to DB via server endpoint (uses service role — bypasses RLS)
-  const saveRes = await fetch("/api/media-save", {
+  // Save video to DB via server (bypasses RLS)
+  await fetch("/api/media-save", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ url: data.secure_url, type: isVideo ? "video" : "image", name: file.name, size: data.bytes ?? null }),
+    body: JSON.stringify({ url: data.secure_url, type: "video", name: file.name, size: data.bytes ?? null }),
   });
-  if (!saveRes.ok) {
-    const err = await saveRes.json().catch(() => ({}));
-    throw new Error(err.error || "שגיאה בשמירת הקובץ");
-  }
 
-  return { url: data.secure_url, type: isVideo ? "video" : "image" };
+  return { url: data.secure_url, type: "video" };
 }
 
 const C = {
@@ -94,7 +99,7 @@ export default function MediaPage() {
       const file = list[i];
       setUploadProgress({ current: i + 1, total: list.length, name: file.name });
       try {
-        await uploadDirect(file);
+        await uploadFile(file);
         count++;
       } catch {}
     }

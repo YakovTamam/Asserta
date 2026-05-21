@@ -3,30 +3,14 @@ import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase-browser";
 
-/* Direct Cloudinary upload — bypasses Vercel 4.5MB limit */
-async function uploadDirect(file) {
-  const signRes = await fetch("/api/cloudinary-sign", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ folder: "asserta/products" }),
-  });
-  if (!signRes.ok) throw new Error("חתימה נכשלה");
-  const { signature, timestamp, api_key, cloud_name, folder } = await signRes.json();
-
+/* Upload image via server route */
+async function uploadImage(file) {
   const fd = new FormData();
   fd.append("file", file);
-  fd.append("signature", signature);
-  fd.append("timestamp", String(timestamp));
-  fd.append("api_key", api_key);
-  fd.append("folder", folder);
-
-  const res  = await fetch(
-    `https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,
-    { method: "POST", body: fd }
-  );
+  const res  = await fetch("/api/upload", { method: "POST", body: fd });
   const data = await res.json();
-  if (!data.secure_url) throw new Error(data.error?.message || "העלאה נכשלה");
-  return data.secure_url;
+  if (!data.url) throw new Error("העלאה נכשלה");
+  return data.url;
 }
 
 /* ── Design tokens ─────────────────────────────── */
@@ -149,7 +133,7 @@ export default function ProductsPage() {
       const file = files[i];
       setUploadProgress({ current: i + 1, total: files.length, name: file.name });
       try {
-        const url = await uploadDirect(file);
+        const url = await uploadImage(file);
         uploaded.push(url);
       } catch {}
     }

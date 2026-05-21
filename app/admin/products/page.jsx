@@ -3,6 +3,32 @@ import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase-browser";
 
+/* Direct Cloudinary upload — bypasses Vercel 4.5MB limit */
+async function uploadDirect(file) {
+  const signRes = await fetch("/api/cloudinary-sign", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ folder: "asserta/products" }),
+  });
+  if (!signRes.ok) throw new Error("חתימה נכשלה");
+  const { signature, timestamp, api_key, cloud_name, folder } = await signRes.json();
+
+  const fd = new FormData();
+  fd.append("file", file);
+  fd.append("signature", signature);
+  fd.append("timestamp", String(timestamp));
+  fd.append("api_key", api_key);
+  fd.append("folder", folder);
+
+  const res  = await fetch(
+    `https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,
+    { method: "POST", body: fd }
+  );
+  const data = await res.json();
+  if (!data.secure_url) throw new Error(data.error?.message || "העלאה נכשלה");
+  return data.secure_url;
+}
+
 /* ── Design tokens ─────────────────────────────── */
 const C = {
   primary:    "#0f172a",
@@ -74,6 +100,7 @@ export default function ProductsPage() {
   const [saving,     setSaving]     = useState(false);
   const [saveError,  setSaveError]  = useState("");
   const [uploading,  setUploading]  = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(null); // { current, total, name }
   const [search,     setSearch]     = useState("");
   const fileRef = useRef(null);
   const supabase = createClient();
@@ -118,15 +145,17 @@ export default function ProductsPage() {
     if (!files.length) return;
     setUploading(true);
     const uploaded = [];
-    for (const file of files) {
-      const fd = new FormData();
-      fd.append("file", file);
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      const data = await res.json();
-      if (data.url) uploaded.push(data.url);
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      setUploadProgress({ current: i + 1, total: files.length, name: file.name });
+      try {
+        const url = await uploadDirect(file);
+        uploaded.push(url);
+      } catch {}
     }
     setForm((p) => ({ ...p, images: [...p.images, ...uploaded] }));
     setUploading(false);
+    setUploadProgress(null);
     if (fileRef.current) fileRef.current.value = "";
   }
 
@@ -271,12 +300,31 @@ export default function ProductsPage() {
           <div style={C.card}>
             <span style={C.label}>תמונות המוצר</span>
             <input ref={fileRef} type="file" accept="image/*" multiple onChange={handleImages} style={{ display: "none" }} />
-            <div onClick={() => fileRef.current?.click()} style={{ border: "2px dashed #cbd5e1", borderRadius: 14, padding: "32px 20px", textAlign: "center", cursor: "pointer", background: "#f8fafc", transition: "all 0.2s", marginBottom: form.images.length ? 16 : 0 }}
-              onMouseEnter={(e) => { e.currentTarget.style.borderColor = C.primary; e.currentTarget.style.background = "#f1f5f9"; }}
+            {/* Upload progress banner */}
+            {uploadProgress && (
+              <div style={{ background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 10, padding: "12px 16px", marginBottom: 12, display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ display: "inline-block", width: 16, height: 16, border: "2px solid #93c5fd", borderTopColor: "#1d4ed8", borderRadius: "50%", flexShrink: 0, animation: "spin 0.7s linear infinite" }} />
+                <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+                <div style={{ minWidth: 0 }}>
+                  <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: "#1d4ed8" }}>מעלה תמונה {uploadProgress.current} מתוך {uploadProgress.total}...</p>
+                  <p style={{ margin: "2px 0 0", fontSize: 11, color: "#3b82f6", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{uploadProgress.name}</p>
+                </div>
+                {uploadProgress.total > 1 && (
+                  <div style={{ marginRight: "auto", flexShrink: 0 }}>
+                    <div style={{ width: 70, height: 5, background: "#bfdbfe", borderRadius: 3, overflow: "hidden" }}>
+                      <div style={{ height: "100%", width: `${(uploadProgress.current / uploadProgress.total) * 100}%`, background: "#1d4ed8", borderRadius: 3, transition: "width 0.3s" }} />
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div onClick={() => !uploading && fileRef.current?.click()} style={{ border: "2px dashed #cbd5e1", borderRadius: 14, padding: "32px 20px", textAlign: "center", cursor: uploading ? "not-allowed" : "pointer", background: "#f8fafc", transition: "all 0.2s", marginBottom: form.images.length ? 16 : 0, opacity: uploading ? 0.5 : 1 }}
+              onMouseEnter={(e) => { if (!uploading) { e.currentTarget.style.borderColor = C.primary; e.currentTarget.style.background = "#f1f5f9"; } }}
               onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#cbd5e1"; e.currentTarget.style.background = "#f8fafc"; }}
             >
-              <div style={{ fontSize: 40, marginBottom: 10 }}>{uploading ? "⏳" : "📷"}</div>
-              <p style={{ fontWeight: 700, color: C.primary, margin: "0 0 4px", fontSize: 15 }}>{uploading ? "מעלה..." : "לחץ להוספת תמונות"}</p>
+              <div style={{ fontSize: 40, marginBottom: 10 }}>📷</div>
+              <p style={{ fontWeight: 700, color: C.primary, margin: "0 0 4px", fontSize: 15 }}>לחץ להוספת תמונות</p>
               <p style={{ color: C.muted, fontSize: 12, margin: 0 }}>מצלמה או גלריה · ניתן לבחור מספר תמונות</p>
             </div>
 

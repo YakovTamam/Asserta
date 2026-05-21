@@ -132,10 +132,13 @@ export default function VideoScrollSection({ position = 1 }) {
 
         {/* Overlays */}
         {overlays.map(ov => {
-          const visible = progress >= ov.scroll_show && progress <= ov.scroll_hide;
+          const showFrom = ov.scroll_show ?? 0;
+          const hideAt   = ov.scroll_hide ?? 1;
+          const visible  = progress >= showFrom && progress <= hideAt;
           const ps = posStyle(ov.pos_x, ov.pos_y);
+          const fontSize = ov.fontSize ? `${ov.fontSize}px` : (TYPE_SIZE[ov.type] || TYPE_SIZE.p);
           return (
-            <div key={ov.id} style={{
+            <div key={ov.id || ov.text} style={{
               position:"absolute", inset:0, zIndex:2, display:"flex",
               flexDirection:"column", direction:"rtl",
               pointerEvents:"none",
@@ -146,7 +149,7 @@ export default function VideoScrollSection({ position = 1 }) {
               {visible && (
                 <span style={{
                   color: ov.color || "#fff",
-                  fontSize: TYPE_SIZE[ov.type] || TYPE_SIZE.p,
+                  fontSize,
                   fontWeight: ov.fontWeight || TYPE_WEIGHT[ov.type] || 400,
                   lineHeight: ov.type === "h1" ? 1.1 : 1.5,
                   textShadow: "0 2px 24px rgba(0,0,0,0.7)",
@@ -163,11 +166,13 @@ export default function VideoScrollSection({ position = 1 }) {
 
         {/* Buttons */}
         {buttons.map(btn => {
-          const visible = progress >= btn.scroll_show && progress <= btn.scroll_hide;
+          const showFrom = btn.scroll_show ?? 0;
+          const hideAt   = btn.scroll_hide ?? 1;
+          const visible  = progress >= showFrom && progress <= hideAt;
           const ps = posStyle(btn.pos_x, btn.pos_y);
           const isPrimary = btn.style === "primary";
           return (
-            <div key={btn.id} style={{
+            <div key={btn.id || btn.text} style={{
               position:"absolute", inset:"0 0 48px 0", zIndex:3, display:"flex",
               direction:"rtl", pointerEvents: visible ? "auto" : "none",
               ...ps,

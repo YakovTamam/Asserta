@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase-browser";
+import { signOut } from "next-auth/react";
 
 const navItems = [
   { href: "/admin", label: "דשבורד", icon: "◻" },
@@ -15,10 +15,7 @@ export default function AdminSidebar() {
   const router = useRouter();
 
   async function handleLogout() {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push("/admin/login");
-    router.refresh();
+    await signOut({ callbackUrl: "/admin/login" });
   }
 
   return (

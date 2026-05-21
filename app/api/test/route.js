@@ -1,11 +1,10 @@
-import { supabaseAdmin } from "@/lib/supabase-server";
+import { connectDB } from "@/lib/mongodb";
 
 export async function GET() {
-  const { data, error } = await supabaseAdmin.from("categories").select("id").limit(1);
-
-  if (error) {
-    return Response.json({ connected: false, error: error.message }, { status: 500 });
+  try {
+    await connectDB();
+    return Response.json({ connected: true, db: "mongodb" });
+  } catch (e) {
+    return Response.json({ connected: false, error: e.message }, { status: 500 });
   }
-
-  return Response.json({ connected: true });
 }

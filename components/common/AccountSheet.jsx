@@ -1,6 +1,13 @@
 "use client";
 import { useState, useEffect } from "react";
-import { createClient } from "@/lib/supabase-browser";
+async function customerApi(body) {
+  const res = await fetch("/api/auth/customer", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  return res.json();
+}
 
 export default function AccountSheet({ open, onClose }) {
   const [mode, setMode]         = useState("login"); // "login" | "register"
@@ -13,10 +20,8 @@ export default function AccountSheet({ open, onClose }) {
   const [success, setSuccess]   = useState("");
   const [user, setUser]         = useState(null);
 
-  const supabase = createClient();
-
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data?.user ?? null));
+    customerApi({ action: "me" }).then(data => setUser(data?.user ?? null));
   }, [open]);
 
   useEffect(() => {
@@ -32,11 +37,10 @@ export default function AccountSheet({ open, onClose }) {
   async function handleLogin(e) {
     e.preventDefault();
     setLoading(true); setError("");
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) { setError("אימייל או סיסמה שגויים"); }
+    const data = await customerApi({ action: "login", email, password });
+    if (data.error) { setError(data.error); }
     else {
-      const { data } = await supabase.auth.getUser();
-      setUser(data?.user ?? null);
+      setUser({ email: data.email });
       setSuccess("ברוכים הבאים!");
       setTimeout(onClose, 1200);
     }
@@ -46,20 +50,16 @@ export default function AccountSheet({ open, onClose }) {
   async function handleRegister(e) {
     e.preventDefault();
     setLoading(true); setError("");
-    const { data, error } = await supabase.auth.signUp({ email, password });
-    if (error) { setError(error.message); setLoading(false); return; }
-    if (phone || fullName) {
-      await supabase.from("customers").upsert(
-        { email, full_name: fullName, phone },
-        { onConflict: "email" }
-      );
-    }
-    setSuccess("נשלח מייל אימות — בדקו את תיבת הדואר!");
+    const data = await customerApi({ action: "register", email, password, full_name: fullName, phone });
+    if (data.error) { setError(data.error); setLoading(false); return; }
+    setUser({ email: data.email });
+    setSuccess("נרשמתם בהצלחה! ברוכים הבאים 🎉");
     setLoading(false);
+    setTimeout(onClose, 1500);
   }
 
   async function handleLogout() {
-    await supabase.auth.signOut();
+    await customerApi({ action: "logout" });
     setUser(null);
     setSuccess("יצאתם בהצלחה");
     setTimeout(onClose, 1000);

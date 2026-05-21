@@ -2,16 +2,16 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Nav from "./Nav";
-import { supabaseAdmin } from "@/lib/supabase-server";
+import { connectDB } from "@/lib/mongodb";
+import Setting from "@/lib/models/Setting";
 
 export default async function Header1({ parentClass = "tf-header line-bt-2" }) {
   let logoUrl       = "/images/logo/logo.svg";
   let logoMobileUrl = "/images/logo/logo-mobile.svg";
   try {
-    const { data } = await supabaseAdmin.from("settings")
-      .select("key,value")
-      .in("key", ["logo_url","logo_mobile_url"]);
-    const map = Object.fromEntries((data || []).map(({ key, value }) => [key, value]));
+    await connectDB();
+    const rows = await Setting.find({ key: { $in: ["logo_url", "logo_mobile_url"] } }).lean();
+    const map = Object.fromEntries(rows.map(({ key, value }) => [key, value]));
     if (map.logo_url)        logoUrl       = map.logo_url;
     if (map.logo_mobile_url) logoMobileUrl = map.logo_mobile_url;
   } catch {}

@@ -1,23 +1,10 @@
 "use client";
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase-browser";
+import { useSession } from "next-auth/react";
 
 export default function AdminFab() {
-  const [show, setShow] = useState(false);
-
-  useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) setShow(true);
-    });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
-      setShow(!!session);
-    });
-    return () => subscription.unsubscribe();
-  }, []);
-
-  if (!show) return null;
+  const { data: session } = useSession();
+  if (!session) return null;
 
   return (
     <Link

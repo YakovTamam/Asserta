@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import { createClient } from "@/lib/supabase-browser";
 
 const C = {
   primary: "#0f172a",
@@ -26,18 +25,21 @@ export default function StoriesAdminPage() {
   const [isSticky, setIsSticky]   = useState(false);
   const [saving,   setSaving]     = useState(false);
   const [saved,    setSaved]      = useState(false);
-  const supabase = createClient();
 
   useEffect(() => {
-    (async () => {
-      const { data } = await supabase.from("settings").select("value").eq("key", "stories_sticky").single();
-      if (data) setIsSticky(data.value === "true");
-    })();
+    fetch("/api/admin/settings?keys=stories_sticky")
+      .then(r => r.json())
+      .then(data => { if (data.stories_sticky) setIsSticky(data.stories_sticky === "true"); })
+      .catch(() => {});
   }, []);
 
   async function handleSave() {
     setSaving(true);
-    await supabase.from("settings").upsert({ key:"stories_sticky", value: String(isSticky) }, { onConflict:"key" });
+    await fetch("/api/admin/settings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ stories_sticky: String(isSticky) }),
+    });
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);

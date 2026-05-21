@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import { createClient } from "@/lib/supabase-browser";
 
 const C = {
   primary:   "#0f172a",
@@ -31,23 +30,20 @@ function KpiCard({ label, value, icon, color }) {
 export default function AdminDashboard() {
   const [counts,       setCounts]       = useState({ products: "—", orders: "—", categories: "—" });
   const [recentOrders, setRecentOrders] = useState([]);
-  const supabase = createClient();
 
   useEffect(() => {
     (async () => {
-      const [{ count: p }, { count: o }, { count: c }] = await Promise.all([
-        supabase.from("products").select("*",   { count: "exact", head: true }),
-        supabase.from("orders").select("*",     { count: "exact", head: true }),
-        supabase.from("categories").select("*", { count: "exact", head: true }),
+      const [prods, orders, cats] = await Promise.all([
+        fetch("/api/admin/products").then(r => r.json()),
+        fetch("/api/admin/orders").then(r => r.json()),
+        fetch("/api/admin/categories").then(r => r.json()),
       ]);
-      setCounts({ products: p ?? 0, orders: o ?? 0, categories: c ?? 0 });
-
-      const { data } = await supabase
-        .from("orders")
-        .select("id, status, total_amount, created_at")
-        .order("created_at", { ascending: false })
-        .limit(6);
-      setRecentOrders(data || []);
+      setCounts({
+        products:   Array.isArray(prods)  ? prods.length  : 0,
+        orders:     Array.isArray(orders) ? orders.length : 0,
+        categories: Array.isArray(cats)   ? cats.length   : 0,
+      });
+      setRecentOrders((Array.isArray(orders) ? orders : []).slice(0, 6));
     })();
   }, []);
 
@@ -71,9 +67,9 @@ export default function AdminDashboard() {
         ) : (
           <div>
             {recentOrders.map((order) => (
-              <div key={order.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid #f1f5f9" }}>
+              <div key={order._id || order.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid #f1f5f9" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <span style={{ fontFamily: "monospace", fontSize: 11, color: "#94a3b8" }}>{order.id.slice(0, 8)}</span>
+                  <span style={{ fontFamily: "monospace", fontSize: 11, color: "#94a3b8" }}>{String(order._id || order.id).slice(-8)}</span>
                   <span style={{ background: statusColors[order.status] || "#f0f0f0", color: statusTextColors[order.status] || "#555", padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 600 }}>
                     {statusLabels[order.status] || order.status}
                   </span>

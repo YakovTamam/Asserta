@@ -1,14 +1,14 @@
 import Script from "next/script";
-import { supabaseAdmin } from "@/lib/supabase-server";
+import { connectDB } from "@/lib/mongodb";
+import Setting from "@/lib/models/Setting";
 
 export default async function MarketingScripts() {
   let settings = {};
   try {
-    const { data } = await supabaseAdmin.from("settings").select("key, value");
-    settings = Object.fromEntries((data || []).map(({ key, value }) => [key, value]));
-  } catch {
-    // Table may not exist yet — silently skip
-  }
+    await connectDB();
+    const rows = await Setting.find().lean();
+    settings = Object.fromEntries(rows.map(({ key, value }) => [key, value]));
+  } catch {}
 
   const { gtm_id, fb_pixel_id, clarity_id, ga4_id } = settings;
 

@@ -17,7 +17,8 @@ import OrderDetails from "@/components/modals/OrderDetails";
 import SiteOnlyComponents from "@/components/common/SiteOnlyComponents";
 import CookieBanner from "@/components/common/CookieBanner";
 import MarketingScripts from "@/components/common/MarketingScripts";
-import { supabaseAdmin } from "@/lib/supabase-server";
+import { connectDB } from "@/lib/mongodb";
+import Setting from "@/lib/models/Setting";
 
 export default async function RootLayout({ children }) {
   const locale = await getLocale();
@@ -26,8 +27,9 @@ export default async function RootLayout({ children }) {
 
   let faviconUrl = "/favicon.ico";
   try {
-    const { data } = await supabaseAdmin.from("settings").select("value").eq("key","favicon_url").single();
-    if (data?.value) faviconUrl = data.value;
+    await connectDB();
+    const row = await Setting.findOne({ key: "favicon_url" }).lean();
+    if (row?.value) faviconUrl = row.value;
   } catch {}
 
   return (

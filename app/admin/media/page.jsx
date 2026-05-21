@@ -2,6 +2,32 @@
 import { useState, useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase-browser";
 
+/* Upload a file directly to Cloudinary (bypasses Vercel's 4.5MB limit) */
+async function uploadDirect(file) {
+  const isVideo = file.type.startsWith("video/");
+  const signRes = await fetch("/api/cloudinary-sign", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ folder: "asserta/media" }),
+  });
+  const { signature, timestamp, api_key, cloud_name, folder } = await signRes.json();
+
+  const fd = new FormData();
+  fd.append("file", file);
+  fd.append("signature", signature);
+  fd.append("timestamp", String(timestamp));
+  fd.append("api_key", api_key);
+  fd.append("folder", folder);
+
+  const res  = await fetch(
+    `https://api.cloudinary.com/v1_1/${cloud_name}/${isVideo ? "video" : "image"}/upload`,
+    { method: "POST", body: fd }
+  );
+  const data = await res.json();
+  if (!data.secure_url) throw new Error(data.error?.message || "Upload failed");
+  return { url: data.secure_url, type: isVideo ? "video" : "image", bytes: data.bytes };
+}
+
 const C = {
   primary: "#0f172a", bg: "#f1f5f9", border: "#e2e8f0", muted: "#64748b",
   danger: "#dc2626", dangerBg: "#fee2e2",
@@ -45,17 +71,16 @@ export default function MediaPage() {
 
   async function handleUpload(fileList) {
     if (!fileList?.length) return;
-    const files = Array.from(fileList);
+    const list = Array.from(fileList);
     setUploading(true);
     let count = 0;
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      setUploadProgress({ current: i + 1, total: files.length, name: file.name });
-      const fd = new FormData();
-      fd.append("file", file);
+    for (let i = 0; i < list.length; i++) {
+      const file = list[i];
+      setUploadProgress({ current: i + 1, total: list.length, name: file.name });
       try {
-        const res = await fetch("/api/upload", { method: "POST", body: fd });
-        if (res.ok) count++;
+        const { url, type, bytes } = await uploadDirect(file);
+        await supabase.from("media_files").insert({ url, type, name: file.name, size: bytes ?? null });
+        count++;
       } catch {}
     }
     await fetchFiles();

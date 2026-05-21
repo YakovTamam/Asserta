@@ -2,6 +2,31 @@
 import { useState, useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase-browser";
 
+/* Upload directly to Cloudinary — bypasses Vercel's 4.5MB serverless limit */
+async function uploadDirect(file) {
+  const signRes = await fetch("/api/cloudinary-sign", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ folder: "asserta/media" }),
+  });
+  const { signature, timestamp, api_key, cloud_name, folder } = await signRes.json();
+
+  const fd = new FormData();
+  fd.append("file", file);
+  fd.append("signature", signature);
+  fd.append("timestamp", String(timestamp));
+  fd.append("api_key", api_key);
+  fd.append("folder", folder);
+
+  const res  = await fetch(
+    `https://api.cloudinary.com/v1_1/${cloud_name}/video/upload`,
+    { method: "POST", body: fd }
+  );
+  const data = await res.json();
+  if (!data.secure_url) throw new Error(data.error?.message || "Upload failed");
+  return data.secure_url;
+}
+
 const C = {
   primary: "#0f172a",
   bg: "#f1f5f9",
@@ -236,20 +261,13 @@ function SectionCard({ section, onChange, onSave, onDelete, savingId, flashId, e
     if (!file) return;
     setUploading(true);
     setUploadError("");
-    const fd = new FormData();
-    fd.append("file", file);
     try {
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      const data = await res.json();
-      if (data.url) {
-        const updated = { ...section, video_url: data.url };
-        onChange(updated);
-        await onSave(updated); // auto-save immediately after upload
-      } else {
-        setUploadError("ההעלאה נכשלה — נסה שנית");
-      }
-    } catch {
-      setUploadError("שגיאת רשת — נסה שנית");
+      const url     = await uploadDirect(file);
+      const updated = { ...section, video_url: url };
+      onChange(updated);
+      await onSave(updated);
+    } catch (e) {
+      setUploadError(e.message || "ההעלאה נכשלה — נסה שנית");
     }
     setUploading(false);
   }

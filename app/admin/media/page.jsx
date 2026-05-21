@@ -22,6 +22,7 @@ export default function MediaPage() {
   const [toast,     setToast]     = useState(null); // { msg, type }
   const [dragOver,  setDragOver]  = useState(false);
   const [selected,  setSelected]  = useState(null); // file object for preview
+  const [uploadProgress, setUploadProgress] = useState(null); // { current, total, name }
   const fileRef = useRef(null);
   const supabase = createClient();
 
@@ -44,9 +45,12 @@ export default function MediaPage() {
 
   async function handleUpload(fileList) {
     if (!fileList?.length) return;
+    const files = Array.from(fileList);
     setUploading(true);
     let count = 0;
-    for (const file of Array.from(fileList)) {
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      setUploadProgress({ current: i + 1, total: files.length, name: file.name });
       const fd = new FormData();
       fd.append("file", file);
       try {
@@ -56,7 +60,8 @@ export default function MediaPage() {
     }
     await fetchFiles();
     setUploading(false);
-    showToast(`הועלו ${count} קבצים בהצלחה`);
+    setUploadProgress(null);
+    showToast(count > 0 ? `הועלו ${count} קבצים בהצלחה` : "ההעלאה נכשלה", count > 0 ? "success" : "danger");
     if (fileRef.current) fileRef.current.value = "";
   }
 
@@ -98,6 +103,33 @@ export default function MediaPage() {
           boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
         }}>
           {toast.msg}
+        </div>
+      )}
+
+      {/* Upload progress banner */}
+      {uploadProgress && (
+        <div style={{
+          background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 12,
+          padding: "14px 20px", marginBottom: 16,
+          display: "flex", alignItems: "center", gap: 12,
+        }}>
+          <span style={{ display: "inline-block", width: 18, height: 18, border: "2px solid #93c5fd", borderTopColor: "#1d4ed8", borderRadius: "50%", flexShrink: 0, animation: "spin 0.7s linear infinite" }} />
+          <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+          <div style={{ minWidth: 0 }}>
+            <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: "#1d4ed8" }}>
+              מעלה קובץ {uploadProgress.current} מתוך {uploadProgress.total}...
+            </p>
+            <p style={{ margin: "2px 0 0", fontSize: 11, color: "#3b82f6", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {uploadProgress.name}
+            </p>
+          </div>
+          {uploadProgress.total > 1 && (
+            <div style={{ marginRight: "auto", flexShrink: 0 }}>
+              <div style={{ width: 80, height: 6, background: "#bfdbfe", borderRadius: 3, overflow: "hidden" }}>
+                <div style={{ height: "100%", width: `${(uploadProgress.current / uploadProgress.total) * 100}%`, background: "#1d4ed8", borderRadius: 3, transition: "width 0.3s" }} />
+              </div>
+            </div>
+          )}
         </div>
       )}
 

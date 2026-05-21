@@ -229,18 +229,28 @@ function ButtonEditor({ btn, onChange, onDelete }) {
 function SectionCard({ section, onChange, onSave, onDelete, savingId, flashId, errorId }) {
   const videoFileRef = useRef(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
   const [expanded, setExpanded] = useState(false);
 
   async function handleVideoUpload(file) {
     if (!file) return;
     setUploading(true);
+    setUploadError("");
     const fd = new FormData();
     fd.append("file", file);
     try {
       const res = await fetch("/api/upload", { method: "POST", body: fd });
       const data = await res.json();
-      if (data.url) onChange({ ...section, video_url: data.url });
-    } catch {}
+      if (data.url) {
+        const updated = { ...section, video_url: data.url };
+        onChange(updated);
+        await onSave(updated); // auto-save immediately after upload
+      } else {
+        setUploadError("ההעלאה נכשלה — נסה שנית");
+      }
+    } catch {
+      setUploadError("שגיאת רשת — נסה שנית");
+    }
     setUploading(false);
   }
 
@@ -294,19 +304,36 @@ function SectionCard({ section, onChange, onSave, onDelete, savingId, flashId, e
           {/* Video */}
           <div style={{ background: "#f8fafc", borderRadius: 12, padding: 14, marginBottom: 16, border: "1px solid #e2e8f0" }}>
             <label style={{ ...C.label, marginBottom: 10 }}>וידאו</label>
+
+            {/* Upload progress banner */}
+            {uploading && (
+              <div style={{ background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 8, padding: "12px 16px", marginBottom: 10, fontSize: 13, color: "#1d4ed8", fontWeight: 600, display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ display: "inline-block", width: 16, height: 16, border: "2px solid #93c5fd", borderTopColor: "#1d4ed8", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />
+                מעלה סרטון לשרת... זה עשוי לקחת כמה שניות
+                <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+              </div>
+            )}
+
+            {/* Error */}
+            {uploadError && (
+              <div style={{ background: "#fee2e2", border: "1px solid #fca5a5", borderRadius: 8, padding: "10px 14px", marginBottom: 10, fontSize: 13, color: C.danger }}>
+                ❌ {uploadError}
+              </div>
+            )}
+
             {section.video_url ? (
               <video src={section.video_url} muted controls style={{ width: "100%", maxHeight: 180, borderRadius: 8, background: "#000", marginBottom: 10 }} />
-            ) : (
+            ) : !uploading && (
               <div style={{ background: "#f1f5f9", borderRadius: 8, padding: 16, textAlign: "center", marginBottom: 10, color: C.muted, fontSize: 13 }}>
                 אין וידאו — לחץ להעלאה
               </div>
             )}
             <div style={{ display: "flex", gap: 8 }}>
               <button type="button" onClick={() => videoFileRef.current?.click()} disabled={uploading}
-                style={{ padding: "8px 16px", background: C.primary, color: "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", opacity: uploading ? 0.7 : 1 }}>
-                {uploading ? "מעלה..." : "העלאת וידאו"}
+                style={{ padding: "8px 16px", background: C.primary, color: "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: uploading ? "not-allowed" : "pointer", opacity: uploading ? 0.5 : 1 }}>
+                העלאת וידאו
               </button>
-              {section.video_url && (
+              {section.video_url && !uploading && (
                 <button type="button" onClick={() => onChange({ ...section, video_url: "" })}
                   style={{ padding: "8px 14px", background: "#fee2e2", color: C.danger, border: "none", borderRadius: 8, fontSize: 13, cursor: "pointer" }}>
                   מחק

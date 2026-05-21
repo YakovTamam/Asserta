@@ -2,16 +2,20 @@
 import { useState, useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase-browser";
 
-/* Upload a file directly to Cloudinary (bypasses Vercel's 4.5MB limit) */
+/* Upload a file directly to Cloudinary, then save URL via server (bypasses Vercel 4.5MB + RLS) */
 async function uploadDirect(file) {
   const isVideo = file.type.startsWith("video/");
+
+  // 1. Get signed params from server
   const signRes = await fetch("/api/cloudinary-sign", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ folder: "asserta/media" }),
   });
+  if (!signRes.ok) throw new Error("חתימה נכשלה");
   const { signature, timestamp, api_key, cloud_name, folder } = await signRes.json();
 
+  // 2. Upload directly to Cloudinary from browser
   const fd = new FormData();
   fd.append("file", file);
   fd.append("signature", signature);
@@ -19,13 +23,25 @@ async function uploadDirect(file) {
   fd.append("api_key", api_key);
   fd.append("folder", folder);
 
-  const res  = await fetch(
+  const uploadRes = await fetch(
     `https://api.cloudinary.com/v1_1/${cloud_name}/${isVideo ? "video" : "image"}/upload`,
     { method: "POST", body: fd }
   );
-  const data = await res.json();
-  if (!data.secure_url) throw new Error(data.error?.message || "Upload failed");
-  return { url: data.secure_url, type: isVideo ? "video" : "image", bytes: data.bytes };
+  const data = await uploadRes.json();
+  if (!data.secure_url) throw new Error(data.error?.message || "Cloudinary: העלאה נכשלה");
+
+  // 3. Save to DB via server endpoint (uses service role — bypasses RLS)
+  const saveRes = await fetch("/api/media-save", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ url: data.secure_url, type: isVideo ? "video" : "image", name: file.name, size: data.bytes ?? null }),
+  });
+  if (!saveRes.ok) {
+    const err = await saveRes.json().catch(() => ({}));
+    throw new Error(err.error || "שגיאה בשמירת הקובץ");
+  }
+
+  return { url: data.secure_url, type: isVideo ? "video" : "image" };
 }
 
 const C = {
@@ -78,8 +94,7 @@ export default function MediaPage() {
       const file = list[i];
       setUploadProgress({ current: i + 1, total: list.length, name: file.name });
       try {
-        const { url, type, bytes } = await uploadDirect(file);
-        await supabase.from("media_files").insert({ url, type, name: file.name, size: bytes ?? null });
+        await uploadDirect(file);
         count++;
       } catch {}
     }

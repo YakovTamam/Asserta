@@ -250,12 +250,74 @@ function ButtonEditor({ btn, onChange, onDelete }) {
   );
 }
 
+/* ── Media library picker modal ── */
+function MediaPicker({ onSelect, onClose }) {
+  const [videos, setVideos]   = useState([]);
+  const [loading, setLoading] = useState(true);
+  const supabase = createClient();
+
+  useEffect(() => {
+    supabase.from("media_files").select("*").eq("type", "video").order("created_at", { ascending: false })
+      .then(({ data }) => { setVideos(data || []); setLoading(false); });
+  }, []);
+
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 9000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+      {/* Backdrop */}
+      <div onClick={onClose} style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.55)" }} />
+
+      {/* Panel */}
+      <div style={{ position: "relative", background: "#fff", borderRadius: 18, width: "100%", maxWidth: 680, maxHeight: "85vh", display: "flex", flexDirection: "column", boxShadow: "0 20px 60px rgba(0,0,0,0.3)", direction: "rtl" }}>
+
+        {/* Header */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 20px", borderBottom: "1px solid #e2e8f0" }}>
+          <h2 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: C.primary }}>בחר סרטון מהספרייה</h2>
+          <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 8, background: "#f1f5f9", border: "none", fontSize: 18, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: C.muted }}>×</button>
+        </div>
+
+        {/* Grid */}
+        <div style={{ overflowY: "auto", padding: 16, flex: 1 }}>
+          {loading ? (
+            <p style={{ textAlign: "center", color: C.muted, fontSize: 14, paddingTop: 40 }}>טוען...</p>
+          ) : videos.length === 0 ? (
+            <div style={{ textAlign: "center", paddingTop: 40 }}>
+              <p style={{ fontSize: 32, marginBottom: 8 }}>🎬</p>
+              <p style={{ color: C.muted, fontSize: 14 }}>אין סרטונים בספרייה — העלה סרטון תחילה</p>
+            </div>
+          ) : (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 10 }}>
+              {videos.map(v => {
+                const name = v.name || v.url.split("/").pop();
+                return (
+                  <button key={v.id} type="button" onClick={() => onSelect(v.url)}
+                    style={{ background: "#f8fafc", borderRadius: 10, border: "1.5px solid #e2e8f0", cursor: "pointer", padding: 0, overflow: "hidden", textAlign: "right", transition: "border-color 0.15s" }}
+                    onMouseEnter={e => e.currentTarget.style.borderColor = C.primary}
+                    onMouseLeave={e => e.currentTarget.style.borderColor = "#e2e8f0"}
+                  >
+                    <div style={{ background: "#1e293b", display: "flex", alignItems: "center", justifyContent: "center", height: 90 }}>
+                      <span style={{ fontSize: 28 }}>🎬</span>
+                    </div>
+                    <div style={{ padding: "8px 10px" }}>
+                      <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: C.primary, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ── Section card ── */
 function SectionCard({ section, onChange, onSave, onDelete, savingId, flashId, errorId }) {
   const videoFileRef = useRef(null);
-  const [uploading, setUploading] = useState(false);
+  const [uploading, setUploading]     = useState(false);
   const [uploadError, setUploadError] = useState("");
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded]       = useState(false);
+  const [showPicker, setShowPicker]   = useState(false);
 
   async function handleVideoUpload(file) {
     if (!file) return;
@@ -346,10 +408,14 @@ function SectionCard({ section, onChange, onSave, onDelete, savingId, flashId, e
                 אין וידאו — לחץ להעלאה
               </div>
             )}
-            <div style={{ display: "flex", gap: 8 }}>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               <button type="button" onClick={() => videoFileRef.current?.click()} disabled={uploading}
                 style={{ padding: "8px 16px", background: C.primary, color: "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: uploading ? "not-allowed" : "pointer", opacity: uploading ? 0.5 : 1 }}>
                 העלאת וידאו
+              </button>
+              <button type="button" onClick={() => setShowPicker(true)} disabled={uploading}
+                style={{ padding: "8px 14px", background: "#f1f5f9", color: C.primary, border: "1.5px solid #e2e8f0", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: uploading ? "not-allowed" : "pointer", opacity: uploading ? 0.5 : 1 }}>
+                🗂 בחר מספרייה
               </button>
               {section.video_url && !uploading && (
                 <button type="button" onClick={() => onChange({ ...section, video_url: "" })}
@@ -359,6 +425,17 @@ function SectionCard({ section, onChange, onSave, onDelete, savingId, flashId, e
               )}
             </div>
             <input ref={videoFileRef} type="file" accept="video/*" style={{ display: "none" }} onChange={e => handleVideoUpload(e.target.files[0])} />
+            {showPicker && (
+              <MediaPicker
+                onSelect={async url => {
+                  setShowPicker(false);
+                  const updated = { ...section, video_url: url };
+                  onChange(updated);
+                  await onSave(updated);
+                }}
+                onClose={() => setShowPicker(false)}
+              />
+            )}
           </div>
 
           {/* Overlays */}

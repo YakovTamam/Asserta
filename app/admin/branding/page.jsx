@@ -1,7 +1,5 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { createClient } from "@/lib/supabase-browser";
-import Image from "next/image";
 
 const C = {
   primary: "#0f172a",
@@ -19,16 +17,12 @@ export default function BrandingPage() {
   const [settings, setSettings] = useState({});
   const [uploading, setUploading] = useState({});
   const [saved, setSaved] = useState(false);
-  const supabase = createClient();
   const fileRefs = useRef({});
 
   useEffect(() => {
-    supabase.from("settings").select("key,value")
-      .in("key", FIELDS.map(f => f.key))
-      .then(({ data }) => {
-        const map = Object.fromEntries((data || []).map(({ key, value }) => [key, value]));
-        setSettings(map);
-      });
+    fetch(`/api/admin/settings?keys=${FIELDS.map(f => f.key).join(",")}`)
+      .then(r => r.json())
+      .then(data => setSettings(data || {}));
   }, []);
 
   async function handleUpload(key, file) {
@@ -40,7 +34,7 @@ export default function BrandingPage() {
     const { url } = await res.json();
     if (url) {
       setSettings(prev => ({ ...prev, [key]: url }));
-      await supabase.from("settings").upsert({ key, value: url }, { onConflict:"key" });
+      await fetch("/api/admin/settings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ [key]: url }) });
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
     }

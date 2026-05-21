@@ -1,12 +1,9 @@
-import { getSupabaseAdmin } from "@/lib/supabase-server";
+import { NextResponse } from "next/server";
+import { connectDB } from "@/lib/mongodb";
+import VideoSection from "@/lib/models/VideoSection";
 
 export async function GET() {
-  const supabase = getSupabaseAdmin();
-  const { data, error } = await supabase
-    .from("video_sections")
-    .select("*")
-    .eq("is_active", true)
-    .order("position");
-  if (error) return Response.json([], { status: 200 });
-  return Response.json(data || []);
+  await connectDB();
+  const sections = await VideoSection.find({ is_active: true }).sort({ position: 1 }).lean();
+  return NextResponse.json(sections.map(s => ({ ...s, id: s._id.toString() })));
 }

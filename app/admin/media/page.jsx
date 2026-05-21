@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { createClient } from "@/lib/supabase-browser";
 
 /* Images → /api/upload (simple, works). Videos → direct to Cloudinary (bypasses Vercel 4.5MB) */
 async function uploadFile(file) {
@@ -71,16 +70,12 @@ export default function MediaPage() {
   const [selected,  setSelected]  = useState(null); // file object for preview
   const [uploadProgress, setUploadProgress] = useState(null); // { current, total, name }
   const fileRef = useRef(null);
-  const supabase = createClient();
 
   useEffect(() => { fetchFiles(); }, []);
 
   async function fetchFiles() {
     setLoading(true);
-    const { data } = await supabase
-      .from("media_files")
-      .select("*")
-      .order("created_at", { ascending: false });
+    const data = await fetch("/api/admin/media").then(r => r.json());
     setFiles(data || []);
     setLoading(false);
   }
@@ -112,9 +107,9 @@ export default function MediaPage() {
 
   async function handleDelete(file) {
     if (!confirm(`למחוק את "${file.name || file.url.split("/").pop()}"?`)) return;
-    await supabase.from("media_files").delete().eq("id", file.id);
+    await fetch("/api/admin/media", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: file._id || file.id }) });
     if (selected?.id === file.id) setSelected(null);
-    setFiles(prev => prev.filter(f => f.id !== file.id));
+    setFiles(prev => prev.filter(f => (f._id || f.id) !== (file._id || file.id)));
     showToast("הקובץ נמחק", "danger");
   }
 

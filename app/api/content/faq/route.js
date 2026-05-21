@@ -1,12 +1,9 @@
-import { getSupabaseAdmin } from "@/lib/supabase-server";
+import { NextResponse } from "next/server";
+import { connectDB } from "@/lib/mongodb";
+import FaqItem from "@/lib/models/FaqItem";
 
 export async function GET() {
-  const supabase = getSupabaseAdmin();
-  const { data, error } = await supabase
-    .from("faq_items")
-    .select("*")
-    .eq("is_active", true)
-    .order("position");
-  if (error) return Response.json([], { status: 200 });
-  return Response.json(data || []);
+  await connectDB();
+  const items = await FaqItem.find().sort({ position: 1 }).lean();
+  return NextResponse.json(items);
 }

@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase-browser";
+import { signOut } from "next-auth/react";
 import styles from "./AdminNav.module.css";
 
 const NAV = [
@@ -207,10 +207,7 @@ export default function AdminNav({ children }) {
   useEffect(() => { setDrawerOpen(false); }, [pathname]);
 
   async function handleLogout() {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push("/admin/login");
-    router.refresh();
+    await signOut({ callbackUrl: "/admin/login" });
   }
 
   return (

@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { createClient } from "@/lib/supabase-browser";
 
 const C = {
   primary: "#0f172a",
@@ -79,7 +78,6 @@ export default function OrdersPage() {
   const [orders,   setOrders]   = useState([]);
   const [selected, setSelected] = useState(null);
   const [filter,   setFilter]   = useState("all");
-  const supabase = createClient();
   const searchParams = useSearchParams();
 
   useEffect(() => { fetchOrders(); }, []);
@@ -90,15 +88,12 @@ export default function OrdersPage() {
   }, [searchParams]);
 
   async function fetchOrders() {
-    const { data } = await supabase
-      .from("orders")
-      .select("*, customers(full_name, email, phone)")
-      .order("created_at", { ascending: false });
+    const data = await fetch("/api/admin/orders").then(r => r.json());
     setOrders(data || []);
   }
 
   async function updateStatus(id, status) {
-    await supabase.from("orders").update({ status }).eq("id", id);
+    await fetch("/api/admin/orders", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, status }) });
     setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status } : o)));
     if (selected?.id === id) setSelected((prev) => ({ ...prev, status }));
   }

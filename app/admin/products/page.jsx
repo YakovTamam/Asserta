@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
-import { createClient } from "@/lib/supabase-browser";
 
 /* Upload image via server route */
 async function uploadImage(file) {
@@ -87,7 +86,6 @@ export default function ProductsPage() {
   const [uploadProgress, setUploadProgress] = useState(null); // { current, total, name }
   const [search,     setSearch]     = useState("");
   const fileRef = useRef(null);
-  const supabase = createClient();
   const searchParams = useSearchParams();
 
   useEffect(() => { fetchAll(); }, []);
@@ -97,9 +95,9 @@ export default function ProductsPage() {
   }, [searchParams]);
 
   async function fetchAll() {
-    const [{ data: prods }, { data: cats }] = await Promise.all([
-      supabase.from("products").select("*").order("created_at", { ascending: false }),
-      supabase.from("categories").select("id, name_he, slug").order("name_he"),
+    const [prods, cats] = await Promise.all([
+      fetch("/api/admin/products").then(r => r.json()),
+      fetch("/api/admin/categories").then(r => r.json()),
     ]);
     setProducts(prods || []);
     setCategories(cats || []);
@@ -171,11 +169,12 @@ export default function ProductsPage() {
       old_price: form.old_price ? parseFloat(form.old_price) : null,
       category_id: category_ids[0] || null,
     };
-    const { error } = editId
-      ? await supabase.from("products").update(payload).eq("id", editId)
-      : await supabase.from("products").insert(payload);
-    if (error) {
-      setSaveError(error.message || "שגיאה בשמירה");
+    const res = editId
+      ? await fetch("/api/admin/products", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: editId, ...payload }) })
+      : await fetch("/api/admin/products", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      setSaveError(errData.error || "שגיאה בשמירה");
       setSaving(false);
       return;
     }
@@ -185,13 +184,13 @@ export default function ProductsPage() {
 
   async function handleDelete(id) {
     if (!confirm("למחוק מוצר זה?")) return;
-    await supabase.from("products").delete().eq("id", id);
+    await fetch("/api/admin/products", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) });
     fetchAll();
   }
 
   function openNew()  { setEditId(null); setForm(emptyForm); setStep(0); setView("form"); }
   function openEdit(p) {
-    setEditId(p.id);
+    setEditId(p._id || p.id);
     setForm({ title_he: p.title_he || "", title_en: p.title_en || "", slug: p.slug || "", description_he: p.description_he || "", description_en: p.description_en || "", price: p.price || "", old_price: p.old_price || "", badge: p.badge || "", in_stock: p.in_stock ?? true, featured: p.featured ?? false, images: p.images || [], category_ids: p.category_ids || (p.category_id ? [p.category_id] : []), specs: p.specs || [] });
     setStep(0); setView("form");
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -229,7 +228,7 @@ export default function ProductsPage() {
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 12 }}>
           {filtered.map((p) => (
-            <div key={p.id} onClick={() => openEdit(p)} style={{ background: "#fff", borderRadius: 14, overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,0.07)", cursor: "pointer", transition: "transform 0.15s, box-shadow 0.15s" }}
+            <div key={p._id || p.id} onClick={() => openEdit(p)} style={{ background: "#fff", borderRadius: 14, overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,0.07)", cursor: "pointer", transition: "transform 0.15s, box-shadow 0.15s" }}
               onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)"; }}
               onMouseLeave={(e) => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.07)"; }}
             >

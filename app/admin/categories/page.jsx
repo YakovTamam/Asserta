@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
-import { createClient } from "@/lib/supabase-browser";
 
 const C = {
   primary:   "#0f172a",
@@ -21,7 +20,6 @@ export default function CategoriesPage() {
   const [uploading,  setUploading]  = useState(false);
   const [showForm,   setShowForm]   = useState(false);
   const fileRef = useRef(null);
-  const supabase = createClient();
   const searchParams = useSearchParams();
 
   useEffect(() => { fetchCategories(); }, []);
@@ -31,7 +29,7 @@ export default function CategoriesPage() {
   }, [searchParams]);
 
   async function fetchCategories() {
-    const { data } = await supabase.from("categories").select("*").order("name_he");
+    const data = await fetch("/api/admin/categories").then(r => r.json());
     setCategories(data || []);
   }
 
@@ -61,12 +59,12 @@ export default function CategoriesPage() {
     e.preventDefault();
     setLoading(true);
     if (editId) {
-      const { error } = await supabase.from("categories").update(form).eq("id", editId);
-      if (error) { alert("שגיאה: " + error.message); setLoading(false); return; }
+      const res = await fetch("/api/admin/categories", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: editId, ...form }) });
+      if (!res.ok) { const d = await res.json().catch(() => ({})); alert("שגיאה: " + (d.error || "unknown")); setLoading(false); return; }
       setEditId(null);
     } else {
-      const { error } = await supabase.from("categories").insert(form);
-      if (error) { alert("שגיאה: " + error.message); setLoading(false); return; }
+      const res = await fetch("/api/admin/categories", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
+      if (!res.ok) { const d = await res.json().catch(() => ({})); alert("שגיאה: " + (d.error || "unknown")); setLoading(false); return; }
     }
     setForm(emptyForm);
     setShowForm(false);
@@ -75,7 +73,7 @@ export default function CategoriesPage() {
   }
 
   function handleEdit(cat) {
-    setEditId(cat.id);
+    setEditId(cat._id || cat.id);
     setForm({ name_he: cat.name_he || "", name_en: cat.name_en || "", slug: cat.slug || "", image_url: cat.image_url || "" });
     setShowForm(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -83,7 +81,7 @@ export default function CategoriesPage() {
 
   async function handleDelete(id) {
     if (!confirm("למחוק קטגוריה זו?")) return;
-    await supabase.from("categories").delete().eq("id", id);
+    await fetch("/api/admin/categories", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) });
     fetchCategories();
   }
 
@@ -174,7 +172,7 @@ export default function CategoriesPage() {
       ) : (
         <div style={{ display: "grid", gap: 10 }}>
           {categories.map((cat) => (
-            <div key={cat.id} style={{ ...C.card, display: "flex", alignItems: "center", gap: 14, padding: 14 }}>
+            <div key={cat._id || cat.id} style={{ ...C.card, display: "flex", alignItems: "center", gap: 14, padding: 14 }}>
               {/* Thumbnail */}
               <div style={{ width: 56, height: 56, borderRadius: 12, overflow: "hidden", background: "#f1f5f9", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>
                 {cat.image_url
@@ -194,7 +192,7 @@ export default function CategoriesPage() {
                 <button onClick={() => handleEdit(cat)} style={{ padding: "7px 14px", background: "#f1f5f9", color: "#374151", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: "pointer" }}>
                   עריכה
                 </button>
-                <button onClick={() => handleDelete(cat.id)} style={{ padding: "7px 14px", background: "#fee2e2", color: "#dc2626", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: "pointer" }}>
+                <button onClick={() => handleDelete(cat._id || cat.id)} style={{ padding: "7px 14px", background: "#fee2e2", color: "#dc2626", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: "pointer" }}>
                   מחק
                 </button>
               </div>

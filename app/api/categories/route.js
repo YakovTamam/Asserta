@@ -1,12 +1,9 @@
-import { supabaseAdmin } from "@/lib/supabase-server";
 import { NextResponse } from "next/server";
+import { connectDB } from "@/lib/mongodb";
+import Category from "@/lib/models/Category";
 
 export async function GET() {
-  const { data, error } = await supabaseAdmin
-    .from("categories")
-    .select("id, name_he, name_en, slug, image_url")
-    .order("name_he");
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json(data || []);
+  await connectDB();
+  const cats = await Category.find().sort({ name_he: 1 }).lean();
+  return NextResponse.json(cats.map(c => ({ ...c, id: c._id.toString() })));
 }

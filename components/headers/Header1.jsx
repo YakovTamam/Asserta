@@ -1,20 +1,22 @@
-import React from "react";
+"use client";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Nav from "./Nav";
-import { connectDB } from "@/lib/mongodb";
-import Setting from "@/lib/models/Setting";
 
-export default async function Header1({ parentClass = "tf-header line-bt-2" }) {
-  let logoUrl       = "/images/logo/logo.svg";
-  let logoMobileUrl = "/images/logo/logo-mobile.svg";
-  try {
-    await connectDB();
-    const rows = await Setting.find({ key: { $in: ["logo_url", "logo_mobile_url"] } }).lean();
-    const map = Object.fromEntries(rows.map(({ key, value }) => [key, value]));
-    if (map.logo_url)        logoUrl       = map.logo_url;
-    if (map.logo_mobile_url) logoMobileUrl = map.logo_mobile_url;
-  } catch {}
+export default function Header1({ parentClass = "tf-header line-bt-2" }) {
+  const [logoUrl,       setLogoUrl]       = useState("/images/logo/logo.svg");
+  const [logoMobileUrl, setLogoMobileUrl] = useState("/images/logo/logo-mobile.svg");
+
+  useEffect(() => {
+    fetch("/api/settings")
+      .then(r => r.json())
+      .then(s => {
+        if (s.logo_url)        setLogoUrl(s.logo_url);
+        if (s.logo_mobile_url) setLogoMobileUrl(s.logo_mobile_url);
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <header className={parentClass}>

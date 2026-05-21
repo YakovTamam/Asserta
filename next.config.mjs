@@ -7,6 +7,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  serverExternalPackages: ["mongoose", "mongodb"],
 };
 
 export default withNextIntl(nextConfig);

@@ -17,6 +17,7 @@ import OrderDetails from "@/components/modals/OrderDetails";
 import SiteOnlyComponents from "@/components/common/SiteOnlyComponents";
 import CookieBanner from "@/components/common/CookieBanner";
 import MarketingScripts from "@/components/common/MarketingScripts";
+import NextAuthProvider from "@/components/common/NextAuthProvider";
 import { connectDB } from "@/lib/mongodb";
 import Setting from "@/lib/models/Setting";
 
@@ -43,6 +44,7 @@ export default async function RootLayout({ children }) {
       </head>
       <body>
         <NextIntlClientProvider messages={messages}>
+          <NextAuthProvider>
           <LayoutWrapper>
             <Context>
               <div id="wrapper">{children}</div>
@@ -61,6 +63,7 @@ export default async function RootLayout({ children }) {
               <MarketingScripts />
             </Context>
           </LayoutWrapper>
+          </NextAuthProvider>
         </NextIntlClientProvider>
       </body>
     </html>

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import VideoSection from "@/lib/models/VideoSection";
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   await connectDB();

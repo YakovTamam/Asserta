@@ -5,6 +5,7 @@ import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { connectDB } from "@/lib/mongodb";
 import Customer from "@/lib/models/Customer";
+export const dynamic = "force-dynamic";
 
 const scryptAsync = promisify(scrypt);
 const secret = () => new TextEncoder().encode(process.env.NEXTAUTH_SECRET || "fallback-dev-secret");

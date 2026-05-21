@@ -72,6 +72,53 @@ function StepBar({ step }) {
   );
 }
 
+/* ── Media library image picker ── */
+function ImagePicker({ onSelect, onClose }) {
+  const [images,  setImages]  = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/admin/media")
+      .then(r => r.json())
+      .then(data => { setImages((data || []).filter(f => f.type === "image")); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
+
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 9000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+      <div onClick={onClose} style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.55)" }} />
+      <div style={{ position: "relative", background: "#fff", borderRadius: 18, width: "100%", maxWidth: 680, maxHeight: "85vh", display: "flex", flexDirection: "column", boxShadow: "0 20px 60px rgba(0,0,0,0.3)", direction: "rtl" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", borderBottom: "1px solid #e2e8f0" }}>
+          <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: C.primary }}>בחר תמונה מהספרייה</h2>
+          <button onClick={onClose} style={{ width: 30, height: 30, borderRadius: 8, background: "#f1f5f9", border: "none", fontSize: 18, cursor: "pointer", color: C.muted }}>×</button>
+        </div>
+        <div style={{ overflowY: "auto", padding: 14, flex: 1 }}>
+          {loading ? (
+            <p style={{ textAlign: "center", color: C.muted, paddingTop: 40 }}>טוען...</p>
+          ) : images.length === 0 ? (
+            <div style={{ textAlign: "center", paddingTop: 40 }}>
+              <p style={{ fontSize: 32 }}>🖼️</p>
+              <p style={{ color: C.muted, fontSize: 14 }}>אין תמונות בספרייה</p>
+            </div>
+          ) : (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))", gap: 8 }}>
+              {images.map(img => (
+                <button key={img.id} type="button" onClick={() => onSelect(img.url)}
+                  style={{ background: "none", border: "1.5px solid #e2e8f0", borderRadius: 10, cursor: "pointer", padding: 0, overflow: "hidden", transition: "border-color 0.15s" }}
+                  onMouseEnter={e => e.currentTarget.style.borderColor = C.primary}
+                  onMouseLeave={e => e.currentTarget.style.borderColor = "#e2e8f0"}
+                >
+                  <img src={img.url} alt={img.name} style={{ width: "100%", aspectRatio: "1", objectFit: "cover", display: "block" }} />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ── Main component ─────────────────────────────── */
 export default function ProductsPage() {
   const [products,   setProducts]   = useState([]);
@@ -84,6 +131,7 @@ export default function ProductsPage() {
   const [saveError,  setSaveError]  = useState("");
   const [uploading,  setUploading]  = useState(false);
   const [uploadProgress, setUploadProgress] = useState(null); // { current, total, name }
+  const [showPicker, setShowPicker] = useState(false);
   const [search,     setSearch]     = useState("");
   const fileRef = useRef(null);
   const searchParams = useSearchParams();
@@ -302,14 +350,27 @@ export default function ProductsPage() {
               </div>
             )}
 
-            <div onClick={() => !uploading && fileRef.current?.click()} style={{ border: "2px dashed #cbd5e1", borderRadius: 14, padding: "32px 20px", textAlign: "center", cursor: uploading ? "not-allowed" : "pointer", background: "#f8fafc", transition: "all 0.2s", marginBottom: form.images.length ? 16 : 0, opacity: uploading ? 0.5 : 1 }}
-              onMouseEnter={(e) => { if (!uploading) { e.currentTarget.style.borderColor = C.primary; e.currentTarget.style.background = "#f1f5f9"; } }}
-              onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#cbd5e1"; e.currentTarget.style.background = "#f8fafc"; }}
-            >
-              <div style={{ fontSize: 40, marginBottom: 10 }}>📷</div>
-              <p style={{ fontWeight: 700, color: C.primary, margin: "0 0 4px", fontSize: 15 }}>לחץ להוספת תמונות</p>
-              <p style={{ color: C.muted, fontSize: 12, margin: 0 }}>מצלמה או גלריה · ניתן לבחור מספר תמונות</p>
+            <div style={{ border: "2px dashed #cbd5e1", borderRadius: 14, padding: "24px 20px", textAlign: "center", background: "#f8fafc", opacity: uploading ? 0.5 : 1 }}>
+              <div style={{ fontSize: 36, marginBottom: 8 }}>📷</div>
+              <p style={{ fontWeight: 700, color: C.primary, margin: "0 0 10px", fontSize: 14 }}>הוסף תמונות למוצר</p>
+              <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
+                <button type="button" onClick={() => !uploading && fileRef.current?.click()} disabled={uploading}
+                  style={{ padding: "9px 16px", background: C.primary, color: "#fff", border: "none", borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: uploading ? "not-allowed" : "pointer" }}>
+                  📤 העלאת תמונה
+                </button>
+                <button type="button" onClick={() => setShowPicker(true)} disabled={uploading}
+                  style={{ padding: "9px 16px", background: "#f1f5f9", color: C.primary, border: "1.5px solid #e2e8f0", borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: uploading ? "not-allowed" : "pointer" }}>
+                  🗂 בחר מספרייה
+                </button>
+              </div>
             </div>
+
+            {showPicker && (
+              <ImagePicker
+                onSelect={url => { setForm(p => ({ ...p, images: [...p.images, url] })); setShowPicker(false); }}
+                onClose={() => setShowPicker(false)}
+              />
+            )}
 
             {form.images.length > 0 && (
               <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 4, WebkitOverflowScrolling: "touch" }}>

@@ -38,13 +38,6 @@ async function uploadFile(file) {
   const data = await uploadRes.json();
   if (!data.secure_url) throw new Error(data.error?.message || "העלאת וידאו נכשלה");
 
-  // Save video to DB via server (bypasses RLS)
-  await fetch("/api/media-save", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ url: data.secure_url, type: "video", name: file.name, size: data.bytes ?? null }),
-  });
-
   return { url: data.secure_url, type: "video" };
 }
 
@@ -90,18 +83,25 @@ export default function MediaPage() {
     const list = Array.from(fileList);
     setUploading(true);
     let count = 0;
+    let lastError = "";
     for (let i = 0; i < list.length; i++) {
       const file = list[i];
       setUploadProgress({ current: i + 1, total: list.length, name: file.name });
       try {
         await uploadFile(file);
         count++;
-      } catch {}
+      } catch (err) {
+        lastError = err.message || "שגיאה לא ידועה";
+      }
     }
     await fetchFiles();
     setUploading(false);
     setUploadProgress(null);
-    showToast(count > 0 ? `הועלו ${count} קבצים בהצלחה` : "ההעלאה נכשלה", count > 0 ? "success" : "danger");
+    if (count > 0) {
+      showToast(`הועלו ${count} קבצים בהצלחה`, "success");
+    } else {
+      showToast(`ההעלאה נכשלה: ${lastError}`, "danger");
+    }
     if (fileRef.current) fileRef.current.value = "";
   }
 
